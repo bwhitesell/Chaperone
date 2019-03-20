@@ -41,7 +41,7 @@ class CLAAPI:
                 'code': response.status_code,
                 'msg': 'Unhandled status code received from server.'
             }
-            raise CLABackendError(**err_info)
+            raise CLAAPIError(**err_info)
 
     def get_incidents(self, limit=1000, offset=0):
         query_args = {
@@ -56,9 +56,11 @@ class CLAAPI:
         }
         return self._request(self._construct_url_arg(**query_args))
 
-    def get_incidents_created_after(self, dt):
+    def get_incidents_created_after(self, dt, limit=1000, offset=0):
         query_args = {
-            'created_at': '> ' + str(dt).replace(' ', 'T')
+            'where': ':created_at>' + "'" + str(dt).replace(' ', 'T') + "'",
+            'limit': limit,
+            'offset': offset
         }
         return self._request(self._construct_url_arg(**query_args))
 

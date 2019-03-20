@@ -4,21 +4,11 @@ import requests
 import settings
 
 
-class CLAAPIError(Exception):
-    def __init__(self, **kwargs):
-        self.url = kwargs.get('url')
-        self.code = kwargs.get('code')
-        self.msg = kwargs.get('msg')
-
-    def __str__(self):
-        return self.msg + f'\n details: \n url: {self.url} \n code: {self.code}'
-
-
 class CLAAPI:
     timeout = 30
     token = None
     headers = None
-    base_url = 'https://data.lacity.org/resource/7fvc-faax.json?$select=:*, *'
+    base_url = 'https://data.lacity.org/resource/7fvc-faax.json?$select=:*, *&$order=:id'
 
     def __init__(self, token=settings.SOCRATA_APP_TOKEN):
         self.token = token
@@ -76,11 +66,3 @@ class CLAAPI:
             page += 1
 
         return results
-
-
-if __name__ == '__main__':
-    be = CLABackend()
-    l = be.get_data(limit=50000)
-    print(len(l))
-
-

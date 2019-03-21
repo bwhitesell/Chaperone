@@ -1,7 +1,5 @@
-import datetime
 import json
 import requests
-import settings
 
 
 class CLAAPIError(Exception):
@@ -20,7 +18,7 @@ class CLAAPI:
     headers = None
     base_url = 'https://data.lacity.org/resource/7fvc-faax.json?$select=:*, *&$order=:id'
 
-    def __init__(self, token=settings.SOCRATA_APP_TOKEN):
+    def __init__(self, token):
         self.token = token
         self.headers = {'X-App-Token': self.token}
 

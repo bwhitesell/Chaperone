@@ -57,12 +57,12 @@ class CrymeFeeder:
         kwargs['limit'] = batch_size
         kwargs['offset'] = 0
         results_chunk = get_records_func(**kwargs)
-
         while results_chunk:
             self._insert_new_incidents(results_chunk)
+            page += 1
             kwargs['offset'] = batch_size * page
             results_chunk = get_records_func(**kwargs)
-            page += 1
+
 
     @property
     def db_most_recently_created_record(self):

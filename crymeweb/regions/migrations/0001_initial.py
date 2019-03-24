@@ -17,7 +17,7 @@ def ingest_regions(apps, schema_editor):
     for geometry_file in geometry_files:
         with open(geometry_file['path'], 'r') as geom_file:
             polygon_coords = str(json.loads(geom_file.read())['geometries'][0]['coordinates'][0][0])
-        GeometricRegion.objects.get_or_create(name=geometry_file['name'], polygon_coordinates=polygon_coords)
+        GeometricRegion.objects.create(name=geometry_file['name'], polygon_coordinates=polygon_coords)
 
 
 class Migration(migrations.Migration):

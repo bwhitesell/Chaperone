@@ -24,19 +24,20 @@ class GeometricRegion(models.Model):
     def __str__(self):
         return 'Region: ' + self.name
 
-    def geom(func):  # an in-class decorator for lazy load of geometric objects
+    def geom(func):  # an in-class decorator for lazy loading of geometric objects
         def _load_geom_and_eval(self, *args, **kwargs):
-            polygon_coords = json.loads(self.polygon_coordinates)
-            lats_vect = np.array([coord[0] for coord in polygon_coords])
-            lons_vect = np.array([coord[1] for coord in polygon_coords])
-            polygon = Polygon(np.column_stack((lons_vect, lats_vect)))
+            if not hasattr(self, 'included_geometry'):
+                polygon_coords = json.loads(self.polygon_coordinates)
+                lats_vect = np.array([coord[0] for coord in polygon_coords])
+                lons_vect = np.array([coord[1] for coord in polygon_coords])
+                polygon = Polygon(np.column_stack((lons_vect, lats_vect)))
 
-            self.included_geometry = {
-                'polygon_coords': polygon_coords,
-                'lats_vect': lats_vect,
-                'lons_vect': lons_vect,
-                'polygon': polygon,
-            }
+                self.included_geometry = {
+                    'polygon_coords': polygon_coords,
+                    'lats_vect': lats_vect,
+                    'lons_vect': lons_vect,
+                    'polygon': polygon,
+                }
             return func(self, *args, **kwargs)
 
         return _load_geom_and_eval

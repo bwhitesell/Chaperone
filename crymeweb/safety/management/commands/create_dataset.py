@@ -7,6 +7,7 @@ import sys
 from regions.models import GeometricRegion
 from safety.models import SafetyAnalysisRequest
 
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
@@ -15,19 +16,23 @@ class Command(BaseCommand):
             help='Gaurantee the command.',
         )
 
+        parser.add_argument(
+            'n_samples',
+            type=int,
+            default=500,
+            help='Number of samples to generate.',
+        )
+
     def handle(self, *args, **options):
         if not options['guarantee']:
             sys.exit(1)
 
         gd = GeometricRegion.objects.first()
         min_lat, max_lat, min_long, max_long = gd.get_bounding_box()
-        dataset = self.generate_location_times(min_lat, max_lat, min_long, max_long, 444, gd, 500)
+        dataset = self.generate_location_times(min_lat, max_lat, min_long, max_long, 444, gd, options['n_samples'])
         SafetyAnalysisRequest.objects.bulk_create(
             [SafetyAnalysisRequest(longitude=row[0], latitude=row[1], timestamp=row[2]) for row in dataset]
         )
-
-
-
 
     def generate_location_times(self, min_lat, max_lat, min_long, max_long, td_size, domain, n_samples):
         samples = []

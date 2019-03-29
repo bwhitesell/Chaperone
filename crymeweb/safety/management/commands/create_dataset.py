@@ -29,7 +29,7 @@ class Command(BaseCommand):
 
         gd = GeometricRegion.objects.first()
         min_lat, max_lat, min_long, max_long = gd.get_bounding_box()
-        dataset = self.generate_location_times(min_lat, max_lat, min_long, max_long, 444, gd, options['n_samples'])
+        dataset = self.generate_location_times(min_lat, max_lat, min_long, max_long, 365, gd, options['n_samples'])
         SafetyAnalysisRequest.objects.bulk_create(
             [SafetyAnalysisRequest(longitude=row[0], latitude=row[1], timestamp=row[2]) for row in dataset]
         )
@@ -42,8 +42,8 @@ class Command(BaseCommand):
             lat = random.uniform(min_lat, max_lat)
             long = random.uniform(min_long, max_long)
             if gd.in_domain(long, lat):
-                ts = datetime.datetime(year=2018, month=1, day=1) + datetime.timedelta(
-                    days=random.uniform(0, td_size))
+                ts = datetime.datetime.now() - datetime.timedelta(
+                    days=random.uniform(5, td_size))
                 samples.append([long, lat, ts])
                 length = len(samples)
                 if length % 1000 == 0:

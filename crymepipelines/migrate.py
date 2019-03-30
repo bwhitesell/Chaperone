@@ -17,7 +17,7 @@ cursor.execute(
         'id INT AUTO_INCREMENT, ' +
         'latitude FLOAT(53) NOT NULL, ' +
         'longitude FLOAT(53) NOT NULL, ' +
-        'timestamp VARCHAR(255) NOT NULL, ' +
+        'timestamp DATETIME NOT NULL, ' +
         'estimate VARCHAR(255), ' +
         'model_id VARCHAR(255), ' +
         'lat_bb INT NOT NULL, ' +

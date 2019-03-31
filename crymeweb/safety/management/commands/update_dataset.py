@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from django.core.management.base import BaseCommand
 from django.db.models import Max
-''
 import random
 import numpy as np
 import sys
@@ -15,7 +14,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--guarantee',
             action='store_true',
-            help='Gaurantee the command.',
+            help='Guarantee the command.',
         )
 
         parser.add_argument(

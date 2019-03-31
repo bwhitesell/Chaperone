@@ -13,7 +13,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--guarantee',
             action='store_true',
-            help='Gaurantee the command.',
+            help='Guarantee the command.',
         )
 
         parser.add_argument(

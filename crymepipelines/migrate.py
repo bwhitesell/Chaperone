@@ -1,15 +1,27 @@
 #  Setup needed db and tables for the crymepipelines application.
+import os
 import pymysql
+from urllib.parse import urlparse
 
-conn = pymysql.connect(host='localhost', user='root', password='',
-                charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
+
+MYSQL_URL = os.environ.get('MYSQL_URL')
+conn_params = urlparse(MYSQL_URL)
+
+conn = pymysql.connect(host=conn_params.hostname,
+                       user=conn_params.username,
+                       password=conn_params.password,
+                       charset='utf8mb4',
+                       cursorclass=pymysql.cursors.DictCursor)
 cursor = conn.cursor()
 
 cursor.execute("CREATE DATABASE crymepipelines;")
 cursor.close()
 
-conn = pymysql.connect(host='localhost', user='root', password='', database='crymepipelines',
-                charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
+conn = pymysql.connect(host=conn_params.hostname,
+                       user=conn_params.username,
+                       password=conn_params.password, charset='utf8mb4',
+                       cursorclass=pymysql.cursors.DictCursor,
+                       database='crymepipelines')
 cursor = conn.cursor()
 
 cursor.execute(
@@ -24,6 +36,18 @@ cursor.execute(
         'lon_bb INT NOT NULL, ' +
         'timestamp_unix BIGINT NOT NULL, ' +
         'count INT, ' +
+        'PRIMARY KEY (id)' +
+        ')  ENGINE=INNODB;'
+)
+
+cursor.execute(
+    'CREATE TABLE IF NOT EXISTS cryme_classifiers (' +
+        'id INT AUTO_INCREMENT, ' +
+        'log_loss FLOAT(53) NOT NULL, ' +
+        'n_samples_train INT NOT NULL, ' +
+        'n_samples_test INT NOT NULL, ' +
+        'model_generated_on DATETIME NOT NULL, ' +
+        'saved_to VARCHAR(255), ' +
         'PRIMARY KEY (id)' +
         ')  ENGINE=INNODB;'
 )

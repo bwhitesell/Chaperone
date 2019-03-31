@@ -1,4 +1,11 @@
+from django.conf import settings
 from django.db import models
+import pickle as p
+
+
+class SafetyModelManager(models.Manager):
+    def active_model(self, model_type):
+        return self.get(pred_type=model_type, current=True)
 
 
 class SafetyModel(models.Model):
@@ -11,6 +18,11 @@ class SafetyModel(models.Model):
     publish_timestamp = models.DateTimeField()
 
     current = models.BooleanField(blank=False)
+
+    objects = SafetyModelManager()
+
+    def load_model(self):
+        return p.load(open(settings.BINARIES_DIR + self.name + '.p', 'rb'))
 
 
 class SafetyAnalysisRequest(models.Model):

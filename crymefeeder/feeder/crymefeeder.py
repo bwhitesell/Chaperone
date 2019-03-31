@@ -1,8 +1,6 @@
 import datetime
 import pymongo
 
-from settings import DB_URL, DB_NAME
-from sources.cla import CLAAPI
 from .utils import cla_timestamp_to_datetime
 
 
@@ -17,14 +15,19 @@ class CrymeFeeder:
         self._write_db_status()
 
     def _write_db_status(self):
+        try:
+            mrc = self.db.incidents.find({}).sort(
+                        [(":created_at", pymongo.DESCENDING)]).limit(1)[0][':created_at']
+        except IndexError:  # instance of collection with no records
+            mrc = 0
+
         self.db.meta.update_one({
             '_id': 'db_state'
         }, {
             '$set': {
                 'last_updated': datetime.datetime.utcnow(),
                 'total_incidents_count': self.db.incidents.count_documents({}),
-                'most_recently_created_at': self.db.incidents.find({}).sort(
-                    [(":created_at", pymongo.DESCENDING)]).limit(1)[0][':created_at']
+                'most_recently_created_at': mrc,
             }
         }, upsert=True)
 
@@ -63,7 +66,6 @@ class CrymeFeeder:
             kwargs['offset'] = batch_size * page
             results_chunk = get_records_func(**kwargs)
 
-
     @property
     def db_most_recently_created_record(self):
         try:
@@ -79,8 +81,8 @@ class CrymeFeeder:
             return True
         return False
 
-    def update_incident_records(self, batch_size):
-        most_recently_created = self.db_most_recently_created_record
+    def update_incident_records(self, batch_size, override_ts=False):
+        most_recently_created = self.db_most_recently_created_record if not override_ts else override_ts
         self._batch_get_and_insert_incidents(batch_size, self.data_source.get_incidents_created_after,
                                              **{'dt': most_recently_created})
 

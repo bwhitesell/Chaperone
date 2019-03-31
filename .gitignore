@@ -107,3 +107,6 @@ venv.bak/
 
 # ide files
 .idea/*
+
+# pickle files
+.p

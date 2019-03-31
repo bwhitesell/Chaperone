@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import pymongo
 
 from feeder import crymefeeder
@@ -21,6 +22,12 @@ def update_data():
     cf = _init_cf()
     if cf.is_data_stale():
         cf.update_incident_records(batch_size=10000)
+
+
+def build_dev_ds():
+    cf = _init_cf()
+    use_dt = datetime.now() - timedelta(days=7)
+    cf.update_incident_records(batch_size=1000, override_ts=use_dt)
 
 
 def check():

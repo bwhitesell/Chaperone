@@ -94,6 +94,7 @@ venv.bak/
 .spyderproject
 .spyproject
 
+
 # Rope project settings
 .ropeproject
 
@@ -106,3 +107,6 @@ venv.bak/
 
 # ide files
 .idea/*
+
+# pickle files
+.p

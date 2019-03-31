@@ -1,5 +1,7 @@
-import datetime
+from datetime import datetime, timedelta
 from django.core.management.base import BaseCommand
+from django.db.models import Max
+''
 import random
 import numpy as np
 import sys
@@ -17,7 +19,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            'n_samples',
+            'samples_per_day',
             type=int,
             default=500,
             help='Number of samples to generate.',
@@ -29,7 +31,10 @@ class Command(BaseCommand):
 
         gd = GeometricRegion.objects.first()
         min_lat, max_lat, min_long, max_long = gd.get_bounding_box()
-        dataset = self.generate_location_times(min_lat, max_lat, min_long, max_long, 365, gd, options['n_samples'])
+        most_recent_ts = SafetyAnalysisRequest.objects.all().aggregate(Max('timestamp'))['timestamp__max']
+        td_size = (datetime.now() - most_recent_ts).total_seconds() / timedelta(days=1).total_seconds()
+        n_samples = td_size * options['samples_per_day']
+        dataset = self.generate_location_times(min_lat, max_lat, min_long, max_long, td_size, gd, n_samples)
         SafetyAnalysisRequest.objects.bulk_create(
             [SafetyAnalysisRequest(longitude=row[0], latitude=row[1], timestamp=row[2]) for row in dataset]
         )
@@ -43,8 +48,8 @@ class Command(BaseCommand):
             lat = random.uniform(min_lat, max_lat)
             long = random.uniform(min_long, max_long)
             if gd.in_domain(long, lat):
-                ts = datetime.datetime.now() - datetime.timedelta(
-                    days=random.uniform(5, td_size))
+                ts = datetime.now() - timedelta(
+                    days=random.uniform(0, td_size))
                 samples.append([long, lat, ts])
                 length = len(samples)
                 if length % 1000 == 0:

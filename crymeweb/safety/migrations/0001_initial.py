@@ -13,12 +13,13 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='SafetyAnalysisRequest',
+            name='SafetyAnalysis',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('latitude', models.FloatField()),
                 ('longitude', models.FloatField()),
                 ('timestamp', models.DateTimeField()),
+                ('model', models.CharField(max_length=100)),
                 ('estimate', models.FloatField(blank=True, null=True)),
             ],
         ),
@@ -33,10 +34,5 @@ class Migration(migrations.Migration):
                 ('publish_timestamp', models.DateTimeField()),
                 ('current', models.BooleanField()),
             ],
-        ),
-        migrations.AddField(
-            model_name='safetyanalysisrequest',
-            name='model',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='safety.SafetyModel'),
         ),
     ]

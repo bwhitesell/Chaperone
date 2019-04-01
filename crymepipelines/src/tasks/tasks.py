@@ -89,7 +89,7 @@ class SearchForCrimesMixin(BaseCrymeTask):
 class BuildDataset(SearchForCrimesMixin):
     def run(self):
         #  import req. data. should require no cleaning as all the data should be pre-vetted by the generation script
-        events_sample = self.load_df_from_mysql('safety_safetyanalysisrequest')
+        events_sample = self.load_df_from_mysql('safety_syntheticanalysisrequest')
         self.search_for_crimes(events_sample, write_to_db=True)
 
 
@@ -99,7 +99,7 @@ class UpdateDataset(SearchForCrimesMixin):
         start_ts = ds.agg({"timestamp": "max"}).collect()[0][0]
         del ds
 
-        events_sample = self.load_df_from_mysql('safety_safetyanalysisrequest')
+        events_sample = self.load_df_from_mysql('safety_syntheticanalysisrequest')
         events_sample = events_sample.filter(events_sample.timestamp > start_ts)
 
         self.search_for_crimes(events_sample, write_to_db=True)

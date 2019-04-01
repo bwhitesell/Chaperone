@@ -5,7 +5,7 @@ import numpy as np
 import sys
 
 from regions.models import GeometricRegion
-from safety.models import SafetyAnalysisRequest
+from safety.models import SyntheticAnalysisRequest
 
 
 class Command(BaseCommand):
@@ -30,8 +30,8 @@ class Command(BaseCommand):
         gd = GeometricRegion.objects.first()
         min_lat, max_lat, min_long, max_long = gd.get_bounding_box()
         dataset = self.generate_location_times(min_lat, max_lat, min_long, max_long, 365, gd, options['n_samples'])
-        SafetyAnalysisRequest.objects.bulk_create(
-            [SafetyAnalysisRequest(longitude=row[0], latitude=row[1], timestamp=row[2]) for row in dataset]
+        SyntheticAnalysisRequest.objects.bulk_create(
+            [SyntheticAnalysisRequest(longitude=row[0], latitude=row[1], timestamp=row[2]) for row in dataset]
         )
 
     @staticmethod

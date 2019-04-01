@@ -25,7 +25,16 @@ class SafetyModel(models.Model):
         return p.load(open(settings.BINARIES_DIR + self.name + '.p', 'rb'))
 
 
-class SafetyAnalysisRequest(models.Model):
+class SafetyAnalysis(models.Model):
+    latitude = models.FloatField(null=False, blank=False)
+    longitude = models.FloatField(null=False, blank=False)
+    timestamp = models.DateTimeField(null=False, blank=False)
+
+    model = models.ForeignKey(SafetyModel, blank=True, null=True, on_delete=models.CASCADE)
+    estimate = models.FloatField(blank=True, null=True)
+
+
+class SyntheticAnalysisRequest(models.Model):
     latitude = models.FloatField(null=False, blank=False)
     longitude = models.FloatField(null=False, blank=False)
     timestamp = models.DateTimeField(null=False, blank=False)

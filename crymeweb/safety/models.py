@@ -1,5 +1,7 @@
+from datetime import datetime
 from django.conf import settings
 from django.db import models
+import numpy as np
 import pickle as p
 
 
@@ -9,6 +11,8 @@ class SafetyModelManager(models.Manager):
 
 
 class SafetyModel(models.Model):
+    predictor = None
+
     MODEL_TYPES = (('PC', 'estimated_time_proximity_incidents'),)
 
     name = models.CharField(max_length=100)
@@ -21,17 +25,21 @@ class SafetyModel(models.Model):
 
     objects = SafetyModelManager()
 
-    def load_model(self):
-        return p.load(open(settings.BINARIES_DIR + self.name + '.p', 'rb'))
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.load_predictor()
+
+    def __str__(self):
+        return 'Model: ' + self.name
+
+    def load_predictor(self):
+        self.predictor = p.load(open(settings.BINARIES_DIR + self.name + '.p', 'rb'))
 
 
 class SafetyAnalysis(models.Model):
     latitude = models.FloatField(null=False, blank=False)
     longitude = models.FloatField(null=False, blank=False)
     timestamp = models.DateTimeField(null=False, blank=False)
-
-    model = models.ForeignKey(SafetyModel, blank=True, null=True, on_delete=models.CASCADE)
-    estimate = models.FloatField(blank=True, null=True)
 
 
 class SyntheticAnalysisRequest(models.Model):

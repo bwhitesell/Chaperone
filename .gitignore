@@ -109,4 +109,4 @@ venv.bak/
 .idea/*
 
 # pickle files
-.p
+*.p

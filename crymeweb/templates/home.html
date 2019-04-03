@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CrymeClarity</title>
+</head>
+<body bgcolor="#E6E6FA">
+    <h2> What is CrymeClarity?</h2>
+    <p> CrymeClarity is a RESTful API that serves public safety information for the city of Los Angeles.</p>
+
+    <h3>Documentation</h3>
+    <p>POST /api/safety-analysis</p>
+    <p style="font-size:80%;">The safety analysis endpoint is designed to return an analysis of the safety of a
+        given location at a given time so long as the location is within the city limits of Los Angeles.</p>
+    <h5>Request Properties</h5>
+    <table style="border-spacing: 5px; text-align: left;">
+      <tr>
+        <th>Property</th>
+          <th>Type</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Latitude</td>
+          <td>Decimal</td>
+        <td>The latitude of the location for which an analysis is desired</td>
+      </tr>
+      <tr>
+        <td>Longitude</td>
+          <td>Decimal</td>
+        <td>The longitude of the location for which an analysis is desired</td>
+      </tr>
+      <tr>
+        <td>Timestamp</td>
+          <td>String</td>
+        <td>The datetime for which the analysis is desired. (In format YYYY-MM-DDThh:mm:ss)</td>
+      </tr>
+    </table>
+
+    <br>
+
+    <h5>Response Properties</h5>
+    <table style="border-spacing: 5px; text-align: left;">
+      <tr>
+        <th>Property</th>
+          <th>Type</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Latitude</td>
+          <td>Decimal</td>
+        <td>The latitude of the location of the analysis</td>
+      </tr>
+      <tr>
+        <td>Longitude</td>
+          <td>Decimal</td>
+        <td>The longitude of the location of the analysis</td>
+      </tr>
+      <tr>
+        <td>Timestamp</td>
+          <td>String</td>
+        <td>The datetime of the analysis. (In format YYYY-MM-DDThh:mm:ss)</td>
+      </tr>
+    </table>
+
+</body>
+</html>

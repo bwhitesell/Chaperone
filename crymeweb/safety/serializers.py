@@ -25,7 +25,6 @@ class SafetyAnalysisSerializer(serializers.ModelSerializer):
         return {
             'positive_prob': self.p_pos,
             'negative_prob': self.p_neg,
-            'description': PC_DESCRIPTION,
         }
 
     def get_safety_rating(self, obj):

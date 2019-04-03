@@ -21,7 +21,6 @@ class GeometricRegion(models.Model):
 
     objects = GeometricRegionManager()
 
-
     def __str__(self):
         return 'Region: ' + self.name
 

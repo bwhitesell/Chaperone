@@ -1,132 +1,133 @@
-function timelineChart(prediction, absAxis) {
-    console.log('hi');
-    var margin = { top: 20, right: 20, bottom: 50, left: 70 },
-        width = 350,
-        height = 350,
-        parseTime = d3.timeParse("%Y-%m-%d"),
-        timeValue = function(d) { return Array.apply(null, {length: N}).map(Function.call, Number); },
-        dataValue = function (d) { return +d[prediction]; },
-        color = "steelblue";
+function SafetyChart(data, width, height) {
+    var svgWidth = width, svgHeight = height;
+    var margin = { top: 50, right: 50, bottom: 50, left: 50 };
+    var width = svgWidth - margin.left - margin.right;
+    var height = svgHeight - margin.top - margin.bottom;
 
-    // From https://bl.ocks.org/mbostock/5649592
-    function transition(path) {
-        path.transition()
-            .duration(3000)
-            .attrTween("stroke-dasharray", tweenDash);
+    var svg = d3.select('svg')
+     .attr("width", svgWidth)
+     .attr("height", svgHeight);
+
+    var g = svg.append("g")
+    .attr("transform",
+      "translate(" + margin.left + "," + margin.top + ")"
+    );
+
+    var x = d3.scaleLinear().rangeRound([0, width]);
+
+    var y = d3.scaleLinear().rangeRound([height, 0]);
+
+    function parseData(data) {
+        var arr = [];
+        counter = 0
+        for (var i in data.estimate.positive_prob){
+            arr.push(
+                {
+                    hour: counter,
+                    value: data.estimate.positive_prob[i]
+                });
+            counter  = counter + 1;
+        }
+        return arr;
     }
-    function tweenDash() {
-        var l = this.getTotalLength(),
-            i = d3.interpolateString("0," + l, l + "," + l);
-        return function (t) { return i(t); };
-    }
+    data = parseData(data);
 
-    function chart(selection) {
-        selection.each(function (data) {
-            data = data.map(function (d, i) {
-                return { time: timeValue(d), value: dataValue(d) };
-            });
-            var x = d3.scaleTime()
-                .rangeRound([0, width - margin.left - margin.right])
-                .domain(d3.extent(data, function(d) { return d.time; }));
+    var line = d3.line()
+       .x(function(d) { return x(d.hour)})
+       .y(function(d) { return y(d.value)})
+       x.domain(d3.extent(data, function(d) { return d.hour }));
+       y.domain([0, .25]);
 
-            var y = d3.scaleLinear()
-                    .rangeRound([height - margin.top - margin.bottom, 0])
-                    .domain(d3.extent(data, function(d) {return d.value;}));
+    g.append("g")
+       .call(d3.axisBottom(x))
+       .attr("transform", "translate(0," + height + ")")
+       .append("text")
+       .attr("fill", "#000")
+       .attr("transform", "rotate(0)")
+       .attr("text-anchor", "middle")
+       .attr("x", (width / 2))
+       .attr("y", 30)
+       .attr("dx", "0.71em")
+       .text("Hour");
 
-            if (absAxis==true) {
-                var y = d3.scaleLinear()
-                    .rangeRound([height - margin.top - margin.bottom, 0])
-                    .domain([0, .4]);
-            };
-            var line = d3.line()
-                .x(function(d) { return x(d.time); })
-                .y(function(d) { return y(d.value); });
-
-            var svg = d3.select(this).selectAll("svg").data([data]);
-            var gEnter = svg.enter().append("svg").append("g");
-
-            gEnter.append("path")
-                .datum(data)
-                .attr("class", "data")
-                .attr("fill", "none")
-                .attr("stroke", "#00C185")
-                .attr("stroke-linejoin", "round")
-                .attr("stroke-linecap", "round")
-                .attr("stroke-width", 3);
-
-            gEnter.append("g").attr("class", "Xaxis");
-            gEnter.append("g").attr("class", "YAxis")
-            gEnter.append("path")
-                .attr("class", "data");
-
-            var svg = selection.select("svg");
-            svg.attr('width', width).attr('height', height);
-            var g = svg.select("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-            g.select("g.Xaxis")
-                .attr("transform", "translate(0," + (height - margin.bottom) + ")")
-                .call(d3.axisBottom(x)
-                      .ticks(10)
-                      .tickSize(-height)
-                      .tickFormat(d3.timeFormat("%B  %Y")))
-                .select(".domain")
-                .remove();
-
-            g.select("g.YAxis")
-                .attr("class", "YAxis")
-                .call(d3.axisLeft(y)
-                    .tickSize(-width)
-                    .ticks(6));
+    g.append("g")
+       .call(d3.axisLeft(y))
+       .append("text")
+       .attr("fill", "#000")
+       .attr("transform", "rotate(-90)")
+       .attr("y", -45)
+       .attr("x", -140)
+       .attr("dy", "0.71em")
+       .attr("text-anchor", "middle")
+       .text("Safety");
 
 
-            g.select("path.data")
-                .datum(data)
-                .attr("d", line)
-                .call(transition);
+    g.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .attr("stroke-width", 1.5)
+        .attr("d", line);
 
 
-        });
-    }
+    g.append("svg:line")
+        .attr("x1", 0)
+        .attr("x2", width)
+        .attr("y1", 260)
+        .attr("y2", 260)
+        .style("stroke", "rgb(124,252,0)")
+
+    g.append("svg:text")
+        .attr("x", width)
+        .attr("y", 262)
+        .text("Safe")
+        .style("font-size", "10px")
+        .style("font-family", "Merriweather Sans")
+
+    g.append("svg:line")
+        .attr("x1", 0)
+        .attr("x2", width)
+        .attr("y1", 225)
+        .attr("y2", 225)
+        .style("stroke", "rgb(248,230,4)")
+
+    g.append("svg:text")
+        .attr("x", width)
+        .attr("y", 228)
+        .text("Neutral")
+        .style("font-size", "10px")
+        .style("font-family", "Merriweather Sans")
 
 
+    g.append("svg:line")
+        .attr("x1", 0)
+        .attr("x2", width)
+        .attr("y1", 190)
+        .attr("y2", 190)
+        .style("stroke", "rgb(255,79,0)")
 
-    chart.margin = function (_) {
-        if (!arguments.length) return margin;
-        margin = _;
-        return chart;
-    };
+    g.append("svg:text")
+        .attr("x", width- 70)
+        .attr("y", 187)
+        .text("Somewhat Dangerous")
+        .style("font-size", "10px")
+         .style("font-family", "Merriweather Sans")
 
-    chart.width = function (_) {
-        if (!arguments.length) return width;
-        width = _;
-        return chart;
-    };
+    g.append("svg:line")
+        .attr("x1", 0)
+        .attr("x2", width)
+        .attr("y1", 154)
+        .attr("y2", 154)
+        .style("stroke", "rgb(246,4,4)")
 
-    chart.height = function (_) {
-        if (!arguments.length) return height;
-        height = _;
-        return chart;
-    };
+    g.append("svg:text")
+        .attr("x", width - 20)
+        .attr("y", 150)
+        .text("Dangerous")
+        .style("fill", "#9e379f")
+        .style("font-size", "10px")
+        .style("font-family", "Merriweather Sans")
 
-    chart.parseTime = function (_) {
-        if (!arguments.length) return parseTime;
-        parseTime = _;
-        return chart;
-    };
-
-    chart.timeValue = function (_) {
-        if (!arguments.length) return timeValue;
-        timeValue = _;
-        return chart;
-    };
-
-    chart.dataValue = function (_) {
-        if (!arguments.length) return dataValue;
-        dataValue = _;
-        return chart;
-    };
-
-
-    return chart;
 }

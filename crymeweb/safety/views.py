@@ -16,13 +16,13 @@ from .utils import get_client_ip
 #  API Views
 class SafetyAnalysisAPIView(APIView):
     def post(self, request):
-        serializer = SafetyAnalysisSerializer(data=request.data)
-        lat = request.data.get('latitude')
-        lon = request.data.get('longitude')
-        serializer.initial_data['tf'] = 'RT'
+        serializer = SafetyAnalysisSerializer(data=request.data, context={'rt': True})
 
         if serializer.is_valid():
-            if GeometricRegion.objects.in_domain(lon, lat):
+            if GeometricRegion.objects.in_domain(
+                    serializer.validated_data['longitude'],
+                    serializer.validated_data['latitude']
+            ):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
@@ -33,12 +33,12 @@ class SafetyAnalysisAPIView(APIView):
 class TodaysSafetyAnalysisAPIView(APIView):
     def post(self, request):
         serializer = SafetyAnalysisSerializer(data=request.data)
-        lat = request.data.get('latitude')
-        lon = request.data.get('longitude')
-        serializer.initial_data['tf'] = 'D'
 
         if serializer.is_valid():
-            if GeometricRegion.objects.in_domain(lon, lat):
+            if GeometricRegion.objects.in_domain(
+                    serializer.validated_data['longitude'],
+                    serializer.validated_data['latitude']
+            ):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:

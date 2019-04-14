@@ -10748,3 +10748,24 @@ body h1 {
 #portfolio .container-fluid .portfolio-box:hover .portfolio-box-caption {
   opacity: 1;
 }
+
+.row-justify-content-center {
+  margin-right: 10%;
+  margin-top: 5%;
+  margin-left: 10%;
+
+}
+
+.card {
+  margin-right: 10%;
+  margin-top: 5%;
+  margin-left: 10%;
+  background-color: rgb(55,56,84);
+
+}
+
+#analysis-container {
+  background-color: rgba(61, 72, 73, 0.99);
+  border-radius: 25px;
+
+}

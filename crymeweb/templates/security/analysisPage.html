@@ -1,15 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container" style="background-color:#ffffff;">
-    <div class="row">
-        <div class="col-md-6">
+<div class="container", id="analysis-container">
+    <div class="row-justify-content-center">
+        <div class="col-md-12">
             <div class="card">
-                <div class="card-header">
-                    Estimated Price (Last 3 Years)
-                </div>
-                <div class="card-body">
-                    <div style="height: 405px;">
+                <div id ="chart-container" class="card-body">
+                    <h5 align="center">24 Hour Safety Analysis</h5>
+                    <div style="height: 550px;">
                         <svg id="chart" class="img-responsive center-block" width="100%" height="100%"></svg>
                     </div>
                 </div>
@@ -17,42 +15,39 @@
     </div>
 </div>
 
-
 <script type="text/javascript">
-    var lat = {{ lat }};
-    var lon = {{ lon }};
-    var date = new Date();
+var lat = {{ lat }};
+var lon = {{ lon }};
+var date = new Date();
 
-    var lines = timelineChart('estimate.positive_prob');
-    function resize() {
-        if (d3.select("#chart svg").empty()) {
-            return;
-        }
-        lines.width(+d3.select("#chart").style("width").replace(/(px)/g, ""))
-            .height(+d3.select("#chart").style("height").replace(/(px)/g, ""));
-        d3.select("#chart").call(lines);
-    }
+var dat = null;
+var chart = null;
+
+function buildChart() {
     $.ajax({
         type: 'POST',
         url: "{% url 'day_safety_analysis' %}",
         data: {
-            "latitude": lat,
-            "longitude": lon,
-            "timestamp": date.getTime()
+            latitude: lat,
+            longitude: lon,
+            timestamp: date.toISOString()
         },
-        success: function (dat) {
-            d3.json(dat, function (data) {
-                d3.select("#chart").datum(data).call(lines);
-                d3.select(window).on('resize', resize);
-                resize();
-            })
+        success: function (data) {
+            dat = data;
+            chart = SafetyChart(data, parseInt(d3.select("#chart-container").style("width"), 10)-50, parseInt(d3.select("#chart-container").style("height"), 10)-50);
         },
     });
-</script>
-        </div>
-    </div>
-</div>
+};
 
+function update() {
+    d3.selectAll("svg > *").remove();
+    chart = SafetyChart(dat, parseInt(d3.select("#chart-container").style("width"), 10)-50, parseInt(d3.select("#chart-container").style("height"), 10)-50);
+}
+
+buildChart();
+ window.addEventListener("resize", update);
+
+</script>
 
 
 {% endblock %}

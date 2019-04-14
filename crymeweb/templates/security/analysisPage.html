@@ -1,4 +1,58 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<div class="container" style="background-color:#ffffff;">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Estimated Price (Last 3 Years)
+                </div>
+                <div class="card-body">
+                    <div style="height: 405px;">
+                        <svg id="chart" class="img-responsive center-block" width="100%" height="100%"></svg>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var lat = {{ lat }};
+    var lon = {{ lon }};
+    var date = new Date();
+
+    var lines = timelineChart('estimate.positive_prob');
+    function resize() {
+        if (d3.select("#chart svg").empty()) {
+            return;
+        }
+        lines.width(+d3.select("#chart").style("width").replace(/(px)/g, ""))
+            .height(+d3.select("#chart").style("height").replace(/(px)/g, ""));
+        d3.select("#chart").call(lines);
+    }
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'day_safety_analysis' %}",
+        data: {
+            "latitude": lat,
+            "longitude": lon,
+            "timestamp": date.getTime()
+        },
+        success: function (dat) {
+            d3.json(dat, function (data) {
+                d3.select("#chart").datum(data).call(lines);
+                d3.select(window).on('resize', resize);
+                resize();
+            })
+        },
+    });
+</script>
+        </div>
+    </div>
+</div>
+
+
+
 {% endblock %}

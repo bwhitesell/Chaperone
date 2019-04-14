@@ -1,6 +1,8 @@
+
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views import View
+import geocoder
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,6 +10,7 @@ from rest_framework import status
 from regions.models import GeometricRegion
 from .forms import LatLonForm
 from .serializers import SafetyAnalysisSerializer
+from .utils import get_client_ip
 
 
 #  API Views
@@ -16,6 +19,7 @@ class SafetyAnalysisAPIView(APIView):
         serializer = SafetyAnalysisSerializer(data=request.data)
         lat = request.data.get('latitude')
         lon = request.data.get('longitude')
+        serializer.initial_data['tf'] = 'RT'
 
         if serializer.is_valid():
             if GeometricRegion.objects.in_domain(lon, lat):
@@ -26,9 +30,24 @@ class SafetyAnalysisAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-#  Good old-fashioned class-based views
+class TodaysSafetyAnalysisAPIView(APIView):
+    def post(self, request):
+        serializer = SafetyAnalysisSerializer(data=request.data)
+        lat = request.data.get('latitude')
+        lon = request.data.get('longitude')
+        serializer.initial_data['tf'] = 'D'
+
+        if serializer.is_valid():
+            if GeometricRegion.objects.in_domain(lon, lat):
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response('lat/lon outside city limits of los angeles.', status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+#  Good old-fashioned templates
 class SafetyAnalysisView(View):
     def get(self, request):
         lat = request.GET.get('lat', None)
@@ -40,12 +59,11 @@ class SafetyAnalysisView(View):
             except ValueError:
                 HttpResponseBadRequest('Invalid query string.')
             if GeometricRegion.objects.in_domain(float(lon), float(lat)):
-                return HttpResponse('hey')
+                return render(request, 'security/analysisPage.html', context={'lat': lat, 'lon': lon})
             else:
                 return HttpResponseBadRequest('lat/lon outside city limits of los angeles.')
 
         return HttpResponseBadRequest('Please provide lat/lon query parameters.')
-
 
     def post(self, request):
         form = LatLonForm(request.POST)
@@ -56,3 +74,9 @@ class SafetyAnalysisView(View):
             lon = form.cleaned_data['longitude']
             return redirect('/safety-analysis?lat=' + str(lat) + '&lon=' + str(lon))
         return HttpResponseBadRequest('Please provide lat/lon parameters.')
+
+
+def home_view(request):
+    geo = geocoder.ip(get_client_ip(request)).latlng
+    geo = {'longitude': geo[0], 'latitude': geo[1]}
+    return render(request, 'index.html', geo)

@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 import numpy as np
 import pickle as p
@@ -7,7 +8,10 @@ import pickle as p
 
 class SafetyModelManager(models.Manager):
     def active_model(self, model_type):
-        return self.get(pred_type=model_type, current=True)
+        try:
+            return self.get(pred_type=model_type, current=True)
+        except ObjectDoesNotExist:
+            return None
 
 
 class SafetyModel(models.Model):
@@ -40,7 +44,6 @@ class SafetyAnalysis(models.Model):
     latitude = models.FloatField(null=False, blank=False)
     longitude = models.FloatField(null=False, blank=False)
     timestamp = models.DateTimeField(null=False, blank=False)
-
 
 class SyntheticAnalysisRequest(models.Model):
     latitude = models.FloatField(null=False, blank=False)

@@ -2616,7 +2616,7 @@ fieldset:disabled a.btn {
 
 .btn-primary:hover {
   color: #fff;
-  background-color: #f24516;
+  background-color: rgb(211, 70, 177);
   border-color: #ee3e0d;
 }
 
@@ -10567,7 +10567,7 @@ html {
 hr.divider {
   max-width: 3.25rem;
   border-width: 0.2rem;
-  border-color: #f4623a;
+  border-color: rgb(211, 70, 177);
 }
 
 hr.light {
@@ -10758,14 +10758,37 @@ body h1 {
 
 .card {
   margin-right: 10%;
-  margin-top: 5%;
+  margin-top: 2%;
+  margin-bottom: 2%;
   margin-left: 10%;
-  background-color: rgb(55,56,84);
+  background-color: rgb(39, 41, 61);
 
 }
 
 #analysis-container {
-  background-color: rgba(61, 72, 73, 0.99);
-  border-radius: 25px;
+  background-color:  rgb(30, 30, 46);
+  border-radius: 10px;
 
+}
+
+.domain {
+    fill: none;
+    stroke: rgba(1,1,1,0);
+    font-weight: 100;
+    shape-rendering: crispEdges;
+}
+
+.tick {
+    fill: none;
+    color: #9a9a9a;
+    font-weight: 50;
+    line.stroke: #9a9a9a;
+    shape-rendering: crispEdges;
+}
+
+#line {
+    fill: none;
+    stroke: #9a9a9a;
+    line.stroke: #9a9a9a;
+    shape-rendering: crispEdges;
 }

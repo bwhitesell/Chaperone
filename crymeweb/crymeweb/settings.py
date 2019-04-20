@@ -130,3 +130,9 @@ STATICFILES_DIRS = [
 # Binary file dir.
 
 BINARIES_DIR = BASE_DIR + '/bin/'
+
+
+# Mongo DB
+
+DB_URL = os.environ.get('DB_URL')
+DB_NAME = os.environ.get('DB_NAME')

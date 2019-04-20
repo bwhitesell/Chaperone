@@ -151,3 +151,6 @@ class TrainCrymeClassifier(BaseCrymeTask):
         cds['day_of_week'] = cds.timestamp.apply(lambda x: x.weekday())
         return cds
 
+
+
+

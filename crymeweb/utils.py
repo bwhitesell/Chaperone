@@ -18,7 +18,7 @@ class SafeMongoClientWrapper:
     def _establish_connection(self):
         self.mc_client = pymongo.MongoClient(self.db_url)[self.db_name]
 
-    def execute_command(self, collection, function, *args, **kwargs):
+    def execute(self, collection, function, *args, **kwargs):
             try_n = 0
             while try_n < self.max_retries:
                 try:

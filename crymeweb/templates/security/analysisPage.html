@@ -14,20 +14,22 @@
             </div>
         </div>
         <div class="col-md-12">
+             <div class="card">
+                 <div class="card-body">
+                    <p align="left" style="color: #9a9a9a; font-family: Poppins,sans-serif; font-size: .875rem;">
+                        Safety Rating: The safety rating measurement is the estimated probability of a crime occuring within .5 miles of a given location within the next hour.
+                    </p>
+                     <p align="left" style="color: #9a9a9a; font-family: Poppins,sans-serif; font-size: .875rem;">
+                        Hour: The hour of the day (in military time).
+                    </p>
+                 </div>
+             </div>
+        </div>
+        <div class="col-md-12">
             <div class="card" >
                 <iframe align="center" src="https://www.google.com/maps?q={{ lon }},{{ lat }}&hl=es;z%3D14&amp;output=embed" frameborder="0" style="border:0" allowfullscreen width="100%" height="100%"></iframe>
             </div>
         </div>
-    </div>
-    <div class="row justify-content-center">
-         <div class="col-md-12">
-            <p align="left" style="color: #9a9a9a; font-family: Poppins,sans-serif; font-size: .875rem;">
-                Safety Rating: The safety rating measurement is the estimated probability of a crime occuring within .5 miles of a given location within the next hour.
-            </p>
-             <p align="left" style="color: #9a9a9a; font-family: Poppins,sans-serif; font-size: .875rem;">
-                Hour: The hour of the day (in military time).
-            </p>
-         </div>
     </div>
     <div class="row justify-content-center">
          <div class="col-md-12">
@@ -57,6 +59,11 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+             </div>
+         </div>
+    </div>
 
 
 </div>

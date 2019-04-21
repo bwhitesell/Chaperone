@@ -5,6 +5,9 @@ from .models import SafetyModel
 pc_model = SafetyModel.objects.active_model('PC')
 PC_DESCRIPTION = 'The probability of a crime occuring within a half mile of the lat/lon provided in the next hour.'
 
+qt_mile_lon = 0.007254180000003885 / 2
+qt_mile_lat = 0.008726950000000073 / 2
+
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')

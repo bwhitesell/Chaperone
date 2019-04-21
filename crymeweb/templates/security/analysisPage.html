@@ -28,6 +28,36 @@
                 Hour: The hour of the day (in military time).
             </p>
          </div>
+    </div>
+    <div class="row justify-content-center">
+         <div class="col-md-12">
+             <div class="card">
+                 <div class="card-header">
+                    <h4 style="color: #9a9a9a; font-family: Poppins,sans-serif;">Recent Crimes Nearby (7 Days)</h4>
+                </div>
+                <div id ="chart-container" class="card-body">
+                    <div class="table-responsive">
+                        <table style="color: #9a9a9a; font-family: Poppins,sans-serif; font-size: 12px;">
+                            <thead>
+                                <tr>
+                                    <th>Crime</th>
+                                    <th>Weapon Desc.</th>
+                                    <th>Location</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for crime in crimes %}
+                                <tr>
+                                    <th>{{ crime.crm_cd_desc }}</th>
+                                    <th>{{ crime.weapon_desc }}</th>
+                                    <th>{{ crime.location }}</th>
+                                    <th>{{ crime.date_occ }}</th>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
 
 </div>
 

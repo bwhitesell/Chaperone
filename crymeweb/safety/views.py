@@ -1,4 +1,5 @@
-
+from datetime import datetime, timedelta
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.views import View
@@ -8,10 +9,13 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from regions.models import GeometricRegion
+from utils import SafeMongoClientWrapper
 from .forms import LatLonForm
 from .serializers import SafetyAnalysisSerializer
-from .utils import get_client_ip
+from .utils import get_client_ip, qt_mile_lat, qt_mile_lon
 
+
+mc = SafeMongoClientWrapper(settings.DB_URL, settings.DB_NAME)
 
 #  API Views
 class SafetyAnalysisAPIView(APIView):
@@ -59,7 +63,17 @@ class SafetyAnalysisView(View):
             except ValueError:
                 HttpResponseBadRequest('Invalid query string.')
             if GeometricRegion.objects.in_domain(float(lon), float(lat)):
-                return render(request, 'security/analysisPage.html', context={'lat': lat, 'lon': lon})
+                crime_search_query = {
+                    'location_1.coordinates.0': {'$gt': lat - qt_mile_lat},
+                    'location_1.coordinates.0': {'$lt': lat + qt_mile_lat},
+                    'location_1.coordinates.1': {'$gt': lon - qt_mile_lon},
+                    'location_1.coordinates.1': {'$lt': lon + qt_mile_lon},
+                    'date_occ': {'$gt': str(datetime.now() - timedelta(days=7)).replace(' ', 'T')}
+
+                 }
+                crimes = list(mc.execute('incidents', 'find', crime_search_query).limit(10))
+
+                return render(request, 'security/analysisPage.html', context={'lat': lat, 'lon': lon, 'crimes': crimes})
             else:
                 return HttpResponseBadRequest('lat/lon outside city limits of los angeles.')
 
@@ -67,8 +81,6 @@ class SafetyAnalysisView(View):
 
     def post(self, request):
         form = LatLonForm(request.POST)
-        print(form)
-        print(form.data)
         if form.is_valid():
             lat = form.cleaned_data['latitude']
             lon = form.cleaned_data['longitude']
@@ -77,6 +89,8 @@ class SafetyAnalysisView(View):
 
 
 def home_view(request):
-    geo = geocoder.ip(get_client_ip(request)).latlng
+    # ip = get_client_ip(request)
+    ip = '161.149.146.201'
+    geo = geocoder.ip(ip).latlng
     geo = {'longitude': geo[0], 'latitude': geo[1]}
     return render(request, 'index.html', geo)

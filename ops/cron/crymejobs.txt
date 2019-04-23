@@ -1,0 +1,18 @@
+#--------------------------------------------------
+# example unix/linux crontab file format:
+#--------------------------------------------------
+# min,hour,dayOfMonth,month,dayOfWeek command
+#
+# field          allowed values
+# -----          --------------
+# minute         0-59
+# hour           0-23
+# day of month   1-31
+# month          1-12 (or names, see below)
+# day of week    0-7 (0 or 7 is Sun, or use names)
+#
+#--------------------------------------------------
+
+# Run crymefeeder's update process every hour to keep the db in sync
+# (This its LAPD's API and pulls in new crime data).
+0 * * * * /home/ubuntu/.envs/cc/bin/python /home/ubuntu/.envs/cc/CrymeClarity/crymefeeder/run.py update_data

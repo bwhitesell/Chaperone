@@ -1,0 +1,18 @@
+[Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+PIDFile=/run/gunicorn/pid
+User=ubuntu
+Group=www-data
+RuntimeDirectory=gunicorn
+WorkingDirectory=/home/ubuntu/.envs/cc/CrymeClarity/crymeweb
+ExecStart=/home/ubuntu/.envs/cc/bin/gunicorn --pid /run/gunicorn/pid --bind unix:/run/gunicorn/socket crymeweb.wsgi --log-level debug --workers=1
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+PrivateTmp=true
+Environment=SECRET_KEY='3nbs80v_0de+3$!t58^-00)-z8@sv2o!@tmm3a8lqpoiw@)8=-' && export DB_URL=mongodb://localhost:27017/ && DB_NAME=crymeclarity
+[Install]
+WantedBy=multi-user.target

@@ -10671,6 +10671,7 @@ body {
   background-repeat: no-repeat;
   background-attachment: scroll;
   background-size: cover;
+  background-attachment: fixed;
 }
 
 body h1 {

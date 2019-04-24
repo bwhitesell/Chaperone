@@ -17,6 +17,7 @@ from .utils import get_client_ip, qt_mile_lat, qt_mile_lon
 
 mc = SafeMongoClientWrapper(settings.DB_URL, settings.DB_NAME)
 
+
 #  API Views
 class SafetyAnalysisAPIView(APIView):
     def post(self, request):
@@ -61,7 +62,7 @@ class SafetyAnalysisView(View):
                 lat = float(lat)
                 lon = float(lon)
             except ValueError:
-                HttpResponseBadRequest('Invalid query string.')
+                return HttpResponseBadRequest('Invalid query string.')
             if GeometricRegion.objects.in_domain(float(lon), float(lat)):
                 crime_search_query = {
                     'location_1.coordinates.0': {'$gt': lat - qt_mile_lat},

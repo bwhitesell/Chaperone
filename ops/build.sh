@@ -7,9 +7,9 @@ export USER=ubuntu
 echo "Installing Dependencies..."
 
 sudo apt-get update
-sudo apt-get upgrade
+yes Y | sudo apt-get upgrade
 
-sudo apt-get install mongodb mysql-server nginx python3-dev python3-pip, git
+yes Y | sudo apt-get install mongodb mysql-server nginx python3-dev python3-pip git virtualenv cron
 
 
 echo "Done Installing Dependencies."
@@ -20,9 +20,11 @@ echo "Building Virtual Environment..."
 pip3 install virtualenv virtualenvwrapper
 mkdir $HOME/.envs/
 
+echo 'export PATH=$PATH:$HOME/.local/bin' | sudo tee -a $HOME/.bashrc
 echo 'VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3' | sudo tee -a $HOME/.bashrc
 echo 'export WORKON_HOME=$HOME/.envs' | sudo tee -a $HOME/.bashrc
-echo '. /usr/local/bin/virtualenvwrapper.sh' | sudo tee -a $HOME/.bashrc
+echo '. ~/.local/bin/virtualenvwrapper.sh' | sudo tee -a $HOME/.bashrc
+source ~/.bashrc
 
 mkvirtualenv cc
 
@@ -47,8 +49,29 @@ echo "export DJANGO_DEBUG=False" | sudo tee -a $HOME/.envs/cc/postactivate
 source $HOME/.bashrc
 echo "Virtual Environment built. Use command 'workon cc' to activate it."
 
+### ADDING CONFIGURATION TO MYSQL, MONGODB, NGINX, GUNICORN ETC
 cd $HOME/.envs/cc
-git clone git@github.com:bwhitesell/CrymeClarity.git
+git clone https://github.com/bwhitesell/CrymeClarity.git
+
+sudo mv $HOME/.envs/cc/CrymeClarity/ops/mysql/my.cnf /etc/mysql/
+
+
+
+
+sudo mv $HOME/.envs/cc/CrymeClarity/ops/nginx/nginx.conf /etc/nginx/
+systemctl enable nginx.service
+
+
+sudo mv $HOME/.envs/cc/CrymeClarity/ops/gunicorn/gunicorn.socket /etc/systemd/system
+sudo mv $HOME/.envs/cc/CrymeClarity/ops/gunicorn/gunicorn.service /etc/systemd/system
+
+sudo touch /etc/tmpfiles.d/gunicorn.conf
+echo "d /run/gunicorn 0755 $USER www-data -" | sudo tee -a /etc/tmpfiles.d/gunicorn.conf
+
+sudo systemctl enable gunicorn.socket
+
+sudo systemctl start gunicorn.socket
+
 
 
 

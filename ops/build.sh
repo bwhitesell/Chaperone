@@ -100,6 +100,7 @@ $HOME/.envs/cc/CrymeClarity/crymeweb/manage.py publish_model 'rfc_cryme_classifi
 sudo systemctl stop gunicorn.service
 sudo systemctl stop gunicorn.socket
 sudo systemctl start gunicorn.socket
+sudo systemctl restart nginx
 
 
 

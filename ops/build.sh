@@ -1,7 +1,6 @@
 #!/bin/bash
 # A script to install dependencies and setup all configurations for production deployment.
 
-
 export USER=ubuntu
 
 echo "Installing Dependencies..."
@@ -9,7 +8,7 @@ echo "Installing Dependencies..."
 sudo apt-get update
 yes Y | sudo apt-get upgrade
 
-yes Y | sudo apt-get install mongodb mysql-server nginx python3-dev python3-pip git virtualenv cron
+yes Y | sudo apt-get install mongodb mysql-server libmysqlclient-dev nginx python3-dev python3-pip git virtualenv cron
 
 
 echo "Done Installing Dependencies."
@@ -36,7 +35,7 @@ touch $HOME/.envs/cc/postactivate
 # configure postactivate w/ the necessary environemental variables #
 echo "echo 'Activating CrymeClarity Virtual Environment...'" | sudo tee -a $HOME/.envs/cc/postactivate
 echo "cd ./CrymeClarity" | sudo tee -a $HOME/.envs/cc/postactivate
-echo "export SOCRATA_APP_TOKEN=''" | sudo tee -a $HOME/.envs/cc/postactivate
+echo "export SOCRATA_APP_TOKEN='UqbVdWcsfLzu2aG4CVLtd4P0O'" | sudo tee -a $HOME/.envs/cc/postactivate
 echo "export DB_URL=mongodb://localhost:27017" | sudo tee -a $HOME/.envs/cc/postactivate
 echo "export DB_NAME=crymeclarity" | sudo tee -a $HOME/.envs/cc/postactivate
 echo "export MYSQL_URL=mysql://root@localhost/crymeweb?serverTimezone=UTC" | sudo tee -a $HOME/.envs/cc/postactivate
@@ -49,7 +48,7 @@ echo "export DJANGO_DEBUG=False" | sudo tee -a $HOME/.envs/cc/postactivate
 source $HOME/.bashrc
 echo "Virtual Environment built. Use command 'workon cc' to activate it."
 
-### ADDING CONFIGURATION TO MYSQL, MONGODB, NGINX, GUNICORN ETC
+### ADDING CONFIGURATION TO MYSQL, MONGODB, NGINX, GUNICORN ETC ###
 cd $HOME/.envs/cc
 git clone https://github.com/bwhitesell/CrymeClarity.git
 
@@ -72,16 +71,32 @@ sudo touch /etc/tmpfiles.d/gunicorn.conf
 echo "d /run/gunicorn 0755 $USER www-data -" | sudo tee -a /etc/tmpfiles.d/gunicorn.conf
 
 sudo systemctl enable gunicorn.socket
-sudo systemctl start gunicorn.socket
-sudo systemctl start gunicorn.service
+
+#CRON (add jobs to crontab)
+crontab $HOME/.envs/cc/CrymeClarity/ops/cron/crymejobs.txt
+
 
 ### SETUP CRYMECLARITY APPLICATIONS ###
 workon cc
 pip install -r $HOME/.envs/cc/CrymeClarity/requirements.txt
 
-#setup crymepipelines
+#Setup crymefeeder
+echo "Syncing crymefeeder with LAPD crime API ..."
+$HOME/.envs/cc/CrymeClarity/crymefeeder/run.py build_dev_ds
+
+
+#Setup crymepipelines
 mysql -u root -e "CREATE DATABASE crymepipelines";
 mysql -u root crymepipelines < $HOME/.envs/cc/CrymeClarity/crymepipelines/migrations/crymePipelines.sql
+
+#Setup crymeweb
+cd $HOME/.envs/cc/CrymeClarity/crymeweb/
+./manage.py migrate
+./manage.py collectstatic
+sudo systemctl start gunicorn.socket
+sudo systemctl start gunicorn.service
+
+
 
 
 

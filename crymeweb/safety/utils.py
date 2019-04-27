@@ -2,7 +2,11 @@ from .models import SafetyModel
 
 
 # Load active models into memory
-pc_model = SafetyModel.objects.active_model('PC')
+try:
+    pc_model = SafetyModel.objects.active_model('PC')
+except:
+    pc_model = None
+
 PC_DESCRIPTION = 'The probability of a crime occuring within a half mile of the lat/lon provided in the next hour.'
 
 qt_mile_lon = 0.007254180000003885 / 2

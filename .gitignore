@@ -110,3 +110,6 @@ venv.bak/
 
 # pickle files
 *.p
+
+# out
+*.out

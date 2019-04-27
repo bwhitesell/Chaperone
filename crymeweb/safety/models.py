@@ -45,6 +45,7 @@ class SafetyAnalysis(models.Model):
     longitude = models.FloatField(null=False, blank=False)
     timestamp = models.DateTimeField(null=False, blank=False)
 
+
 class SyntheticAnalysisRequest(models.Model):
     latitude = models.FloatField(null=False, blank=False)
     longitude = models.FloatField(null=False, blank=False)

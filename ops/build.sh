@@ -8,7 +8,7 @@ echo "Installing Dependencies..."
 sudo apt-get update
 yes Y | sudo apt-get upgrade
 
-yes Y | sudo apt-get install mongodb mysql-server libmysqlclient-dev nginx python3-dev python3-pip git virtualenv cron
+yes Y | sudo apt-get install mongodb mysql-server libmysqlclient-dev nginx python3-dev python3-pip git cron
 
 
 echo "Done Installing Dependencies."
@@ -20,7 +20,7 @@ pip3 install virtualenv virtualenvwrapper
 mkdir $HOME/.envs/
 
 echo 'export PATH=$PATH:$HOME/.local/bin' | sudo tee -a $HOME/.bashrc
-echo 'VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3' | sudo tee -a $HOME/.bashrc
+echo 'export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3' | sudo tee -a $HOME/.bashrc
 echo 'export WORKON_HOME=$HOME/.envs' | sudo tee -a $HOME/.bashrc
 echo '. ~/.local/bin/virtualenvwrapper.sh' | sudo tee -a $HOME/.bashrc
 source ~/.bashrc
@@ -61,7 +61,7 @@ sudo systemctl restart mongodb
 
 #NGINX
 sudo mv $HOME/.envs/cc/CrymeClarity/ops/nginx/nginx.conf /etc/nginx/
-systemctl enable nginx.service
+sudo systemctl enable nginx.service
 
 #GUNICORN
 sudo mv $HOME/.envs/cc/CrymeClarity/ops/gunicorn/gunicorn.socket /etc/systemd/system
@@ -74,7 +74,6 @@ sudo systemctl enable gunicorn.socket
 
 #CRON (add jobs to crontab)
 crontab $HOME/.envs/cc/CrymeClarity/ops/cron/crymejobs.txt
-
 
 ### SETUP CRYMECLARITY APPLICATIONS ###
 workon cc
@@ -90,11 +89,17 @@ mysql -u root -e "CREATE DATABASE crymepipelines";
 mysql -u root crymepipelines < $HOME/.envs/cc/CrymeClarity/crymepipelines/migrations/crymePipelines.sql
 
 #Setup crymeweb
+mysql -u root -e "CREATE DATABASE crymeweb";
 cd $HOME/.envs/cc/CrymeClarity/crymeweb/
 ./manage.py migrate
 ./manage.py collectstatic
+#download default model
+curl -o $HOME/.envs/cc/CrymeClarity/crymeweb/bin/rfc_cryme_classifier_2019_03_31.p https://www.filehosting.org/file/details/797191/rcf_cryme_classifier_2019-03-31.p
+$HOME/.envs/cc/CrymeClarity/crymeweb/manage.py publish_model 'rfc_cryme_classifier_2019_03_31.p' '0.1' 'PC'
+
+sudo systemctl stop gunicorn.service
+sudo systemctl stop gunicorn.socket
 sudo systemctl start gunicorn.socket
-sudo systemctl start gunicorn.service
 
 
 

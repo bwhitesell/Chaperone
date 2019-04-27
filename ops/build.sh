@@ -53,15 +53,18 @@ echo "Virtual Environment built. Use command 'workon cc' to activate it."
 cd $HOME/.envs/cc
 git clone https://github.com/bwhitesell/CrymeClarity.git
 
+# MYSQL
 sudo mv $HOME/.envs/cc/CrymeClarity/ops/mysql/my.cnf /etc/mysql/
+sudo systemctl restart mysql
 
+#MONGODB
+sudo systemctl restart mongodb
 
-
-
+#NGINX
 sudo mv $HOME/.envs/cc/CrymeClarity/ops/nginx/nginx.conf /etc/nginx/
 systemctl enable nginx.service
 
-
+#GUNICORN
 sudo mv $HOME/.envs/cc/CrymeClarity/ops/gunicorn/gunicorn.socket /etc/systemd/system
 sudo mv $HOME/.envs/cc/CrymeClarity/ops/gunicorn/gunicorn.service /etc/systemd/system
 
@@ -69,9 +72,16 @@ sudo touch /etc/tmpfiles.d/gunicorn.conf
 echo "d /run/gunicorn 0755 $USER www-data -" | sudo tee -a /etc/tmpfiles.d/gunicorn.conf
 
 sudo systemctl enable gunicorn.socket
-
 sudo systemctl start gunicorn.socket
+sudo systemctl start gunicorn.service
 
+### SETUP CRYMECLARITY APPLICATIONS ###
+workon cc
+pip install -r $HOME/.envs/cc/CrymeClarity/requirements.txt
+
+#setup crymepipelines
+mysql -u root -e "CREATE DATABASE crymepipelines";
+mysql -u root crymepipelines < $HOME/.envs/cc/CrymeClarity/crymepipelines/migrations/crymePipelines.sql
 
 
 

@@ -5,10 +5,10 @@ export USER=ubuntu
 
 echo "Installing Dependencies..."
 
-sudo apt-get update
 yes Y | sudo apt-get upgrade
+sudo apt-get update
 
-yes Y | sudo apt-get install mongodb mysql-server libmysqlclient-dev nginx python3-dev python3-pip git cron
+yes Y | sudo apt-get install mongodb mysql-server libmysqlclient-dev nginx python3-dev python3-pip git cron libgeos-dev vim
 
 
 echo "Done Installing Dependencies."
@@ -94,8 +94,8 @@ cd $HOME/.envs/cc/CrymeClarity/crymeweb/
 ./manage.py migrate
 ./manage.py collectstatic
 #download default model
-curl -o $HOME/.envs/cc/CrymeClarity/crymeweb/bin/rfc_cryme_classifier_2019_03_31.p https://www.filehosting.org/file/details/797191/rcf_cryme_classifier_2019-03-31.p
-$HOME/.envs/cc/CrymeClarity/crymeweb/manage.py publish_model 'rfc_cryme_classifier_2019_03_31.p' '0.1' 'PC'
+curl -o $HOME/.envs/cc/CrymeClarity/crymeweb/bin/rfc_cryme_classifier_2019_03_31.p https://s3-us-west-1.amazonaws.com/crymeclarity/rcf_cryme_classifier_2019-03-31.p
+$HOME/.envs/cc/CrymeClarity/crymeweb/manage.py publish_model 'rfc_cryme_classifier_2019_03_31' '0.1' 'PC' --guarantee
 
 sudo systemctl stop gunicorn.service
 sudo systemctl stop gunicorn.socket

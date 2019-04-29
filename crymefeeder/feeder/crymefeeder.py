@@ -1,13 +1,14 @@
 import datetime
 import pymongo
 
+from settings import RECORD_THRESHOLD
 from .utils import cla_timestamp_to_datetime
 
 
 class CrymeFeeder:
     data_source = None
     db = None
-    record_threshold = 500
+    record_threshold = RECORD_THRESHOLD
 
     def __init__(self, data_source, db):
         self.data_source = data_source

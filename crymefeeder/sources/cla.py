@@ -1,6 +1,8 @@
 import json
 import requests
 
+from settings import REQUEST_TIMEOUT_LIMIT
+
 
 class CLAAPIError(Exception):
     def __init__(self, **kwargs):
@@ -13,7 +15,7 @@ class CLAAPIError(Exception):
 
 
 class CLAAPI:
-    timeout = 30
+    timeout = REQUEST_TIMEOUT_LIMIT
     token = None
     headers = None
     base_url = 'https://data.lacity.org/resource/7fvc-faax.json?$select=:*, *&$order=:id'

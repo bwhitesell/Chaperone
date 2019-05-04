@@ -14,7 +14,7 @@ class GeometricRegionManager(models.Manager):
 
 
 class GeometricRegion(models.Model):
-    """ A model to define regions for which there is total incident reporting coverage I.E. valid domains. """
+    """ A model to define objects for which there is total incident reporting coverage I.E. valid domains. """
 
     name = models.CharField(max_length=100, null=False, blank=False)
     polygon_coordinates = models.TextField(null=False, blank=False)

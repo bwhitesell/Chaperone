@@ -1,31 +1,30 @@
+from settings import DB_URL, FEEDER_DB_URL, CRYMEWEB_DB_URL
 
 
 class BaseCrymeTask:
-    mysql_url = None
-    mongo_url = None
-    spark = None
 
-    def __init__(self, spark, mysql_url, mongo_url):
-        self.spark = spark
-        self.mysql_url = mysql_url
-        self.mongo_url = mongo_url
+    def __init__(self, spark_session):
+        self.spark = spark_session  # not all tasks use spark but the session is there regardless.
+        self.db_url = DB_URL
+        self.feeder_db_url = FEEDER_DB_URL
+        self.web_db_url = CRYMEWEB_DB_URL
 
-    def load_df_from_mysql(self, table):
+    def load_df_from_db(self, table):
         return self.spark.read.format("jdbc").options(
-            url="jdbc:" + self.mysql_url,
+            url="jdbc:" + self.db_url,
             driver="com.mysql.jdbc.Driver",
             dbtable=table,
         ).load()
 
-    def load_df_from_mongo(self, collection):
-        return self.spark.read.format("com.mongodb.spark.sql.DefaultSource").option(
-            "uri",
-            self.mongo_url + '.' + collection
-        ).load()
-
-    def write_to_mysql(self, df, table):
+    def write_to_db(self, df, table):
         df.write.format('jdbc').options(
-            url="jdbc:" + 'mysql://root@localhost/crymepipelines?serverTimezone=UTC',
+            url="jdbc:" + self.db_url,
             driver='com.mysql.jdbc.Driver',
             dbtable=table,
         ).mode('overwrite').save()
+
+    def load_df_from_crymefeeder(self, collection):
+        return self.spark.read.format("com.mongodb.spark.sql.DefaultSource").option(
+            "uri",
+            self.crymefeeder_url + '.' + collection
+        ).load()

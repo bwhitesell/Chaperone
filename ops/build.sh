@@ -38,11 +38,14 @@ echo "cd ./CrymeClarity" | sudo tee -a $HOME/.envs/cc/postactivate
 echo "export SOCRATA_APP_TOKEN='UqbVdWcsfLzu2aG4CVLtd4P0O'" | sudo tee -a $HOME/.envs/cc/postactivate
 echo "export DB_URL=mongodb://localhost:27017" | sudo tee -a $HOME/.envs/cc/postactivate
 echo "export DB_NAME=crymeclarity" | sudo tee -a $HOME/.envs/cc/postactivate
-echo "export MYSQL_URL=mysql://root@localhost/crymeweb?serverTimezone=UTC" | sudo tee -a $HOME/.envs/cc/postactivate
+echo "export CRYMEWEB_DB_URL=mysql://root@localhost/crymeweb" | sudo tee -a $HOME/.envs/cc/postactivate
+echo "export CRYMEPIPELINES_DB_URL=mysql://root@localhost/crymepipelines?serverTimezone=UTC" | sudo tee -a $HOME/.envs/cc/postactivate
+echo "export CRYMEFEEDER_DB_URL=mongodb://localhost:27017/crymeclarity" | sudo tee -a $HOME/.envs/cc/postactivate
 echo "export MONGO_URL=mongodb://localhost:27017/crymeclarity" | sudo tee -a $HOME/.envs/cc/postactivate
 echo "export SECRET_KEY=''" | sudo tee -a $HOME/.envs/cc/postactivate
 echo "export STATIC_ROOT=/home/ubuntu/static" | sudo tee -a $HOME/.envs/cc/postactivate
 echo "export DJANGO_DEBUG=False" | sudo tee -a $HOME/.envs/cc/postactivate
+echo "AIRFLOW_HOME=$HOME/airflow" | sudo tee -a $HOME/.envs/cc/postactivate
 
 
 source $HOME/.bashrc
@@ -92,7 +95,7 @@ mysql -u root crymepipelines < $HOME/.envs/cc/CrymeClarity/crymepipelines/migrat
 mysql -u root -e "CREATE DATABASE crymeweb";
 cd $HOME/.envs/cc/CrymeClarity/crymeweb/
 ./manage.py migrate
-./manage.py collectstatic
+yes Y | ./manage.py collectstatic
 #download default model
 curl -o $HOME/.envs/cc/CrymeClarity/crymeweb/bin/rfc_cryme_classifier_2019_03_31.p https://s3-us-west-1.amazonaws.com/crymeclarity/rcf_cryme_classifier_2019-03-31.p
 $HOME/.envs/cc/CrymeClarity/crymeweb/manage.py publish_model 'rfc_cryme_classifier_2019_03_31' '0.1' 'PC' --guarantee

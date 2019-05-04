@@ -32,7 +32,7 @@ class GenerateLocationTimeSamples(BaseCrymeTask):
 class BuildDataset(SearchForCrimesMixin):
     def run(self):
         #  import req. data. should require no cleaning as all the data should be pre-vetted by the generation script
-        events_sample = self.load_df_from_mysql('safety_syntheticanalysisrequest')
+        events_sample = self.load_df_from_mysql('location_time_samples')
         self.search_for_crimes(events_sample, write_to_db=False)
 
 

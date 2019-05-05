@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta
 import os
 
+
+BASE_DIR = os.path.dirname((os.path.abspath(__file__)))
+TMP_DIR = os.path.abspath(BASE_DIR + '/..') + '/tmp'
+
 DB_URL = os.environ.get('CRYMEPIPELINES_DB_URL')
 FEEDER_DB_URL = os.environ.get('CRYMEFEEDER_DB_URL')
 CRYMEWEB_DB_URL = os.environ.get('CRYMEWEB_DB_URL')

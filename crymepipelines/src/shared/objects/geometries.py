@@ -1,8 +1,9 @@
 import json
 import numpy as np
-from settings import cp_conn
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
+
+from shared.settings import cp_conn
 
 
 class GeometricRegion:

@@ -1,7 +1,7 @@
 from datetime import datetime
 import pymongo
 
-from settings import FEEDER_DB_URL
+from shared.settings import FEEDER_DB_URL
 
 
 class CrymePipelinesMongoConn:

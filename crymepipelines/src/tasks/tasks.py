@@ -7,8 +7,8 @@ import random
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import log_loss
 
-from objects.samples import SamplesManager
-from settings import CF_TRUST_DELAY, START_DATE, cf_conn, cp_conn
+from shared.objects.samples import SamplesManager
+from shared,settings import CF_TRUST_DELAY, START_DATE, cf_conn, cp_conn, TMP_DIR
 from .base import BaseCrymeTask
 from .mixins import SearchForCrimesMixin
 
@@ -28,24 +28,12 @@ class GenerateLocationTimeSamples(BaseCrymeTask):
             raise ValueError('Invalid Update Date Specified.')
 
 
-
 class BuildDataset(SearchForCrimesMixin):
     def run(self):
         #  import req. data. should require no cleaning as all the data should be pre-vetted by the generation script
-        events_sample = self.load_df_from_mysql('location_time_samples')
-        self.search_for_crimes(events_sample, write_to_db=False)
-
-
-class UpdateDataset(SearchForCrimesMixin):
-    def run(self):
-        ds = self.load_df_from_mysql('dataset')
-        start_ts = ds.agg({"timestamp": "max"}).collect()[0][0]
-        del ds
-
-        events_sample = self.load_df_from_mysql('safety_syntheticanalysisrequest')
-        events_sample = events_sample.filter(events_sample.timestamp > start_ts)
-
-        self.search_for_crimes(events_sample, write_to_db=True)
+        events_sample = self.load_df_from_db('location_time_samples')
+        features_ds = self.search_for_crimes(events_sample)
+        features_ds.write.parquet(TMP_DIR + '/features.parquet')
 
 
 class TrainCrymeClassifier(BaseCrymeTask):

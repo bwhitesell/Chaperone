@@ -2,7 +2,7 @@ import pymysql
 import time
 from urllib.parse import urlparse
 
-from settings import DB_URL
+from shared.settings import DB_URL
 
 
 class CrymePipelinesMySqlConn:

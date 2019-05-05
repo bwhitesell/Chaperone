@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta
 import random
 
-from settings import cp_conn, START_DATE
+from shared.settings import cp_conn, START_DATE
 from .geometries import GeometricRegion
 
 

@@ -1,4 +1,4 @@
-from settings import DB_URL, FEEDER_DB_URL, CRYMEWEB_DB_URL
+from shared.settings import DB_URL, FEEDER_DB_URL, CRYMEWEB_DB_URL
 
 
 class BaseCrymeTask:

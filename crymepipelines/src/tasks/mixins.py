@@ -7,8 +7,8 @@ from .mappings import ts_conv, t_occ_conv, actb_lat, actb_lon, space_dist
 
 
 class SearchForCrimesMixin(BaseCrymeTask):
-    def search_for_crimes(self, events_sample, write_to_db=True):
-        crime_incidents = self.load_df_from_mongo("incidents")
+    def search_for_crimes(self, events_sample, write_to_db=False):
+        crime_incidents = self.load_df_from_crymefeeder("incidents")
 
         # clean data
 

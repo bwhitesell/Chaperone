@@ -113,3 +113,7 @@ venv.bak/
 
 # out
 *.out
+
+# data files
+*.parquet
+*.csv

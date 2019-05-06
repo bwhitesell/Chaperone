@@ -4,7 +4,8 @@ it performs OLAP on the data provided by crymefeeder and persists results for us
 by crymeweb.
 
 The functional object in CrymePipelines is a `CrymeTask`. CrymeTasks are defined in the
- `src/tasks.py` file and scheduled via an airflow DAG.
+ `src/tasks.py` file and scheduled via an airflow DAG. CrymeTasks are built by defining a
+ class that inherits `tasks.base.BaseCrymeTask` (as well as any mixins) and has a single `run` method.
  
  
 #### Config

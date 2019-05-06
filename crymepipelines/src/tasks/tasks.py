@@ -17,7 +17,6 @@ class GenerateLocationTimeSamples(BaseCrymeTask):
         sm = SamplesManager()
         cf_freshness = cf_conn.get_recency_data()
         update_date = (cf_freshness - CF_TRUST_DELAY).date()
-        print(update_date)
         # check the update date before running.
         if (update_date < datetime.now().date()) and (update_date > START_DATE):
             sm.update_samples(update_date)
@@ -69,10 +68,13 @@ class TrainCrymeClassifier(BaseCrymeTask):
         target = 'crime_occ'
 
         data = pd.read_csv(self.input_file)
-
+        print(cf_conn.get_recency_data())
+        print(cf_conn.get_recency_data() - CF_TRUST_DELAY)
         ts_end = cf_conn.get_recency_data() - CF_TRUST_DELAY - timedelta(days=15)
         ts_start = str(ts_end - timedelta(days=300))
         ts_end = str(ts_end)
+        print(ts_end)
+        print(ts_start)
 
         train_ds = data[(data.timestamp > ts_start) & (data.timestamp < ts_end)]
         test_ds = data[(data.timestamp > ts_end)]

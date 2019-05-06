@@ -21,7 +21,7 @@ def populate_data():
 def update_data():
     cf = _init_cf()
     if cf.is_data_stale():
-        cf.update_incident_records(batch_size=10000)
+        cf.update_incident_records(batch_size=50000)
 
 
 def build_dev_ds():

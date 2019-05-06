@@ -4,6 +4,7 @@ import os
 
 BASE_DIR = os.path.dirname((os.path.abspath(__file__)))
 TMP_DIR = os.path.abspath(BASE_DIR + '/..') + '/tmp'
+BIN_DIR = os.path.abspath(BASE_DIR + '/..') + '/bin'
 
 DB_URL = os.environ.get('CRYMEPIPELINES_DB_URL')
 FEEDER_DB_URL = os.environ.get('CRYMEFEEDER_DB_URL')
@@ -21,8 +22,8 @@ CF_TRUST_DELAY = timedelta(days=14)
 START_DATE = datetime(year=2018, month=4, day=1).date()
 
 
-from db.mysql.connection import CrymePipelinesMySqlConn
-from db.mongo.connection import CrymePipelinesMongoConn
+from shared.db.mysql.connection import CrymePipelinesMySqlConn
+from shared.db.mongo.connection import CrymePipelinesMongoConn
 
 cp_conn = CrymePipelinesMySqlConn()
 cf_conn = CrymePipelinesMongoConn()

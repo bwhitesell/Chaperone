@@ -38,7 +38,7 @@ cp $HOME/spark/conf/spark-defaults.conf.template $HOME/spark/conf/spark-defaults
 echo 'spark.io.compression.codec org.apache.spark.io.SnappyCompressionCodec' | sudo tee -a /$HOME/spark/conf/spark-defaults.conf
 
 # Give Spark 25GB of RAM, use Python3
-echo "spark.driver.memory 50g" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
+echo "spark.driver.memory 30g" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
 echo "spark.executor.cores 12" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
 echo "PYSPARK_PYTHON=python3" | sudo tee -a $SPARK_HOME/conf/spark-env.sh
 echo "PYSPARK_DRIVER_PYTHON=python3" | sudo tee -a $SPARK_HOME/conf/spark-env.sh
@@ -51,6 +51,7 @@ sed -i 's/INFO/ERROR/g' $SPARK_HOME/conf/log4j.properties
 curl -o $SPARK_HOME/jars/mongo-spark-connector_2.12-2.4.0.jar http://central.maven.org/maven2/org/mongodb/spark/mongo-spark-connector_2.12/2.4.0/mongo-spark-connector_2.12-2.4.0.jar
 curl -o $SPARK_HOME/jars/scala-library-2.12.7.jar http://central.maven.org/maven2/org/scala-lang/scala-library/2.12.7/scala-library-2.12.7.jar
 curl -o $SPARK_HOME/jars/mongo-java-driver-3.9.0.jar http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.9.0/mongo-java-driver-3.9.0.jar
+curl -o $SPARK_HOME/jars/mysql-connector-java-8.0.14.jar http://central.maven.org/maven2/mysql/mysql-connector-java/8.0.14/mysql-connector-java-8.0.14.jar
 
 
 # Give to user

@@ -26,5 +26,5 @@ class BaseCrymeTask:
     def load_df_from_crymefeeder(self, collection):
         return self.spark.read.format("com.mongodb.spark.sql.DefaultSource").option(
             "uri",
-            self.crymefeeder_url + '.' + collection
+            self.feeder_db_url + '.' + collection
         ).load()

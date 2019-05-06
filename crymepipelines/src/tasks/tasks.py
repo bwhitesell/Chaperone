@@ -1,21 +1,18 @@
 from datetime import datetime, timedelta
-import numpy as np
 import pandas as pd
 import pickle as p
-import pymysql
-import random
+import shutil
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import log_loss
 
 from shared.objects.samples import SamplesManager
-from shared,settings import CF_TRUST_DELAY, START_DATE, cf_conn, cp_conn, TMP_DIR
+from shared.settings import CF_TRUST_DELAY, START_DATE, cf_conn, cp_conn, TMP_DIR, BIN_DIR
 from .base import BaseCrymeTask
 from .mixins import SearchForCrimesMixin
+from .mappings import crime_occ_udf, ts_to_minutes_in_day_udf, ts_to_hour_of_day_udf, ts_to_day_of_week_udf
 
 
 class GenerateLocationTimeSamples(BaseCrymeTask):
-    task_type = 'single'
-
     def run(self):
         sm = SamplesManager()
         cf_freshness = cf_conn.get_recency_data()
@@ -29,61 +26,60 @@ class GenerateLocationTimeSamples(BaseCrymeTask):
 
 
 class BuildDataset(SearchForCrimesMixin):
+    output_file = TMP_DIR + '/features.parquet'
+
     def run(self):
-        #  import req. data. should require no cleaning as all the data should be pre-vetted by the generation script
         events_sample = self.load_df_from_db('location_time_samples')
         features_ds = self.search_for_crimes(events_sample)
         features_ds.write.parquet(TMP_DIR + '/features.parquet')
 
 
+class CleanDataset(BaseCrymeTask):
+    input_file = TMP_DIR + '/features.parquet'
+    output_file = TMP_DIR + '/features_clean.parquet'
+
+    def run(self):
+        df = self.spark.read.parquet(self.input_file)
+        df = df.fillna(0, subset=['count'])  # fill none values with 0.
+        df.write.parquet(self.output_file)
+        shutil.rmtree(self.input_file)
+
+
+class EngineerFeatures(BaseCrymeTask):
+    input_file = TMP_DIR + '/features_clean.parquet'
+    output_file = TMP_DIR + '/final_dataset.csv'
+
+    def run(self):
+        df = self.spark.read.parquet(self.input_file)
+        df = df.withColumn('crime_occ', crime_occ_udf(df['count']))
+        df = df.withColumn('time_minutes', ts_to_minutes_in_day_udf(df.timestamp))
+        df = df.withColumn('hour', ts_to_hour_of_day_udf(df.timestamp))
+        df = df.withColumn('day_of_week', ts_to_day_of_week_udf(df.timestamp))
+        df.toPandas().to_csv(self.output_file, index=False)
+        shutil.rmtree(self.input_file)
+
+
 class TrainCrymeClassifier(BaseCrymeTask):
     task_type = 'single'
+    input_file = TMP_DIR + '/final_dataset.csv'
+    output_file = BIN_DIR + '/cryme_classifier_' + str(datetime.now().date()) + '.p'
 
-    def run(self, model_save_path):
+    def run(self):
         features = ['longitude', 'latitude', 'time_minutes', 'day_of_week']
-        conn = pymysql.connect(host='localhost',
-                               user='root',
-                               password='',
-                               db='crymepipelines',
-                               charset='utf8mb4',
-                               cursorclass=pymysql.cursors.DictCursor)
+        target = 'crime_occ'
 
-        ts_end = (datetime.now() - timedelta(days=30)).date()
-        ts_start = ts_end - timedelta(days=300)
+        data = pd.read_csv(self.input_file)
 
-        cds = pd.read_sql('SELECT * FROM dataset WHERE timestamp < "' + str(ts_end) +
-                          '" AND timestamp > "' + str(ts_start) + '"', conn)
-        cds_test = pd.read_sql('SELECT * FROM dataset WHERE timestamp >= "' + str(ts_end) + '"', conn)
+        ts_end = cf_conn.get_recency_data() - CF_TRUST_DELAY - timedelta(days=15)
+        ts_start = str(ts_end - timedelta(days=300))
+        ts_end = str(ts_end)
 
-        cds = self.clean_and_engineer_ds(cds)
-        cds_test = self.clean_and_engineer_ds(cds_test)
-
+        train_ds = data[(data.timestamp > ts_start) & (data.timestamp < ts_end)]
+        test_ds = data[(data.timestamp > ts_end)]
+        print(test_ds)
         rfc = RandomForestClassifier(max_depth=10, n_estimators=500, n_jobs=-1)
-        rfc.fit(cds[features], cds['crime_occ'])
-        y_est = rfc.predict_proba(cds_test[features])
-        ll = log_loss(cds_test['crime_occ'], y_est)
-
-        cur = conn.cursor()
-        cur.execute('INSERT INTO cryme_classifiers (log_loss, n_samples_train, n_samples_test, model_generated_on, ' +
-                    f'saved_to) VALUES ({ll}, {cds.shape[0]}, {cds_test.shape[0]}, "{datetime.now()}", ' +
-                    f'"{model_save_path}")')
-        cur.close()
-
-        p.dump(rfc, open(model_save_path + '/rfc_cryme_classifier' + str(datetime.now()) + '.p', 'wb'))
-
-    @staticmethod
-    def clean_and_engineer_ds(cds):
-        cds.columns = cds.columns = ['id', 'latitude', 'longitude', 'timestamp', 'estimate', 'model_id',
-               'lat_bb', 'lon_bb', 'timestamp_unix', 'n_crimes']
-        cds.n_crimes = cds.n_crimes.fillna(0)
-
-        cds['crime_occ'] = cds.n_crimes.apply(lambda x: min(x, 1))
-
-        cds['time_minutes'] = cds.timestamp.apply(lambda x: datetime.time(x).hour * 60 + datetime.time(x).minute)
-        cds['hour'] = cds.timestamp.apply(lambda x: datetime.time(x).hour)
-        cds['day_of_week'] = cds.timestamp.apply(lambda x: x.weekday())
-        return cds
-
-
-
-
+        rfc.fit(train_ds[features], train_ds[target])
+        y_est = rfc.predict_proba(test_ds[features])
+        ll = log_loss(test_ds[target], y_est)
+        print(ll)
+        p.dump(rfc, open(self.output_file, 'wb'))

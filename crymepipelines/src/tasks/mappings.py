@@ -36,9 +36,29 @@ def cla_timestamp_to_datetime(cla_ts):
         return datetime.datetime(year=1, month=1, day=1)
 
 
+def crime_occ(n_crimes):
+    return 1 if n_crimes > 0 else 0
+
+
+def ts_to_minutes_in_day(x):
+    return x.hour * 60 + x.minute
+
+
+def ts_to_hour_of_day(x):
+    return x.hour
+
+
+def ts_to_day_of_week(x):
+    return x.weekday()
+
+
 # Define UDFs here
 actb_lat = udf(assign_coordinate_to_lat_box, IntegerType())
 actb_lon = udf(assign_coordinate_to_lon_box, IntegerType())
 ts_conv = udf(cla_timestamp_to_datetime, TimestampType())
 t_occ_conv = udf(time_occ_to_seconds, IntegerType())
 space_dist = udf(lambda w, x, y, z: mpu.haversine_distance((w, x), (y, z)) * 0.621371, FloatType())
+crime_occ_udf = udf(crime_occ, IntegerType())
+ts_to_minutes_in_day_udf = udf(ts_to_minutes_in_day, IntegerType())
+ts_to_hour_of_day_udf = udf(ts_to_hour_of_day, IntegerType())
+ts_to_day_of_week_udf = udf(ts_to_day_of_week, IntegerType())

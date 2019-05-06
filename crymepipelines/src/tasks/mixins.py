@@ -7,7 +7,7 @@ from .mappings import ts_conv, t_occ_conv, actb_lat, actb_lon, space_dist
 
 
 class SearchForCrimesMixin(BaseCrymeTask):
-    def search_for_crimes(self, events_sample, write_to_db=False):
+    def search_for_crimes(self, events_sample):
         crime_incidents = self.load_df_from_crymefeeder("incidents")
 
         # clean data
@@ -75,7 +75,4 @@ class SearchForCrimesMixin(BaseCrymeTask):
         results = results.groupBy(col('id')).count()
         dataset = events_sample.join(results, "id", "left_outer")
 
-        if write_to_db:
-            self.write_to_mysql(dataset, 'dataset')
-        else:
-            return dataset
+        return dataset

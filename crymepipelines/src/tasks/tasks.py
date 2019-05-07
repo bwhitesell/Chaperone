@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
+import os
 import pandas as pd
 import pickle as p
 import shutil
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import log_loss
 
 from shared.objects.samples import SamplesManager
 from shared.settings import CF_TRUST_DELAY, START_DATE, cf_conn, cp_conn, TMP_DIR, BIN_DIR
@@ -64,24 +63,22 @@ class TrainCrymeClassifier(BaseCrymeTask):
     output_file = BIN_DIR + '/cryme_classifier_' + str(datetime.now().date()) + '.p'
 
     def run(self):
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.metrics import log_loss
         features = ['longitude', 'latitude', 'time_minutes', 'day_of_week']
         target = 'crime_occ'
 
         data = pd.read_csv(self.input_file)
-        print(cf_conn.get_recency_data())
-        print(cf_conn.get_recency_data() - CF_TRUST_DELAY)
         ts_end = cf_conn.get_recency_data() - CF_TRUST_DELAY - timedelta(days=15)
         ts_start = str(ts_end - timedelta(days=300))
         ts_end = str(ts_end)
-        print(ts_end)
-        print(ts_start)
 
         train_ds = data[(data.timestamp > ts_start) & (data.timestamp < ts_end)]
         test_ds = data[(data.timestamp > ts_end)]
-        print(test_ds)
         rfc = RandomForestClassifier(max_depth=10, n_estimators=500, n_jobs=-1)
         rfc.fit(train_ds[features], train_ds[target])
         y_est = rfc.predict_proba(test_ds[features])
         ll = log_loss(test_ds[target], y_est)
         print(ll)
         p.dump(rfc, open(self.output_file, 'wb'))
+        os.remove(self.input_file)

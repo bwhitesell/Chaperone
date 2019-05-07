@@ -2,9 +2,14 @@ from datetime import datetime, timedelta
 import os
 
 
-BASE_DIR = os.path.dirname((os.path.abspath(__file__)))
+raw_pth = os.path.dirname((os.path.abspath(__file__)))
+if "shared.zip" in raw_pth:
+    BASE_DIR = os.path.abspath(raw_pth + '/..')
+else:
+    BASE_DIR = raw_pth
+
 TMP_DIR = os.path.abspath(BASE_DIR + '/..') + '/tmp'
-BIN_DIR = os.path.abspath(BASE_DIR + '/..') + '/bin'
+BIN_DIR = os.path.abspath(BASE_DIR + '/../..') + '/bin'
 
 DB_URL = os.environ.get('CRYMEPIPELINES_DB_URL')
 FEEDER_DB_URL = os.environ.get('CRYMEFEEDER_DB_URL')

@@ -11,7 +11,7 @@ The functional object in CrymePipelines is a `CrymeTask`. CrymeTasks are defined
  
  
 #### Config
-As mentioned above, CrymePipelines must be configured to communicate with the mongodb 
+CrymePipelines must be configured to communicate with the mongodb 
 instance managed by CrymeFeeder, the mysql db instance managed by CrymeWeb and an additional mysql db
 instance for storing metadata necessary for CrymePipelines to function. All three
 of these connections are configured via `src/shared/settings.py` E.G.

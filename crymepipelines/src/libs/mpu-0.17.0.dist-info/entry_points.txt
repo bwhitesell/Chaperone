@@ -1,3 +1,0 @@
-[console_scripts]
-mpu = mpu._cli:main
-

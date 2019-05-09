@@ -20,11 +20,12 @@ class SamplesManager:
 
         samples_recency = self.get_samples_recency()
         if date_arg <= samples_recency:
-            raise ValueError(f'Samples already updated to {samples_recency}')
+            print(f'Samples already updated to {samples_recency}')
+            return None
 
         # argument checking done, now perform operation
         n_days = (date_arg - samples_recency).days
-        for day in range(1, n_days):
+        for day in range(1, n_days + 1):
             add_date = samples_recency + timedelta(days=day)
             self._add_samples(add_date)
             print(f'Generated samples for {add_date}.')
@@ -51,7 +52,7 @@ class SamplesManager:
             lat = random.uniform(min_lat, max_lat)
             long = random.uniform(min_long, max_long)
             if self.gd.in_domain(long, lat):
-                ts = dt_date_arg - timedelta(
+                ts = dt_date_arg + timedelta(
                     hours=random.uniform(0, 24))
                 samples.append({
                     'longitude': long,

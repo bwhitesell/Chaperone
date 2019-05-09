@@ -8,6 +8,8 @@ echo "Installing Dependencies..."
 yes Y | sudo apt-get upgrade
 sudo apt-get update
 
+yes Y | sudo apt-get install mongodb mysql-server libmysqlclient-dev python3-dev python3-pip git cron libgeos-dev vim
+
 # Intall OpenJDK 8 - Oracle Java no longer available
 #
 sudo add-apt-repository ppa:openjdk-r/ppa
@@ -15,7 +17,7 @@ sudo apt-get update
 sudo apt-get install -y openjdk-8-jdk
 
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" | sudo tee -a $HOME/.bashrc
+echo "export JAVA_HOME=/usr/libs/jvm/java-8-openjdk-amd64" | sudo tee -a $HOME/.bashrc
 
 # install scala (yuck)
 sudo apt-get install scala
@@ -59,3 +61,44 @@ sudo chown -R $USER $HOME/spark
 sudo chgrp -R $USER $HOME/spark
 
 echo "Done Installing Dependencies."
+
+
+
+### BUILDING VIRTUAL ENVIRONMENT ###
+echo "Building Virtual Environment..."
+pip3 install virtualenv virtualenvwrapper
+mkdir $HOME/.envs/
+
+echo 'export PATH=$PATH:$HOME/.local/bin' | sudo tee -a $HOME/.bashrc
+echo 'export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3' | sudo tee -a $HOME/.bashrc
+echo 'export WORKON_HOME=$HOME/.envs' | sudo tee -a $HOME/.bashrc
+echo '. ~/.local/bin/virtualenvwrapper.sh' | sudo tee -a $HOME/.bashrc
+source ~/.bashrc
+
+mkvirtualenv cc
+
+# customize the postactivate functionality of virtualenvwrapper #
+echo 'cd $VIRTUAL_ENV' | sudo tee -a $HOME/.envs/postactivate
+echo 'source $VIRTUAL_ENV/postactivate' | sudo tee -a $HOME/.envs/postactivate
+touch $HOME/.envs/cc/postactivate
+
+# configure postactivate w/ the necessary environemental variables #
+echo "echo 'Activating CrymeClarity Virtual Environment...'" | sudo tee -a $HOME/.envs/cc/postactivate
+echo "AIRFLOW_HOME=$HOME/airflow" | sudo tee -a $HOME/.envs/cc/postactivate
+export AIRFLOW_HOME=$HOME/airflow
+
+# airflow
+workon cc & pip install gunicorn & pip install airflow
+sudo mkdir /etc/sysconfig/
+sudo cp $HOME/.envs/cc/CrymeClarity/ops/airflow/airflow-scheduler.service /etc/systemd/system
+sudo cp $HOME/.envs/cc/CrymeClarity/ops/airflow/airflow-webserver.service /etc/systemd/system
+sudo cp $HOME/.envs/cc/CrymeClarity/ops/airflow/airflow.conf /etc/tmpfiles.d
+sudo cp $HOME/.envs/cc/CrymeClarity/ops/airflow/airflow /etc/sysconfig
+
+echo "AIRFLOW_HOME=$AIRFLOW_HOME" | sudo tee -a /etc/sysconfig/airflow
+echo "SPARK_HOME=$SPARK_HOME" | sudo tee -a /etc/sysconfig/airflow
+echo "AIRFLOW_CONFIG=$AIRFLOW_HOME/airflow.cfg" | sudo tee -a /etc/sysconfig/airflow
+echo "PATH=$PATH" | sudo tee -a /etc/sysconfig/airflow
+
+#create a symlink
+ln -s $HOME/.envs/cc/CrymeClarity/crymepipelines/cp_dags.py $AIRFLOW_HOME/dags

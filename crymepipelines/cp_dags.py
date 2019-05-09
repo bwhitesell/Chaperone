@@ -14,15 +14,16 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-base_spark_submit = 'cd $HOME/.envs/cc/CrymeClarity/crymepipelines/dist && spark-submit --py-files shared.zip,tasks.zip '
+base_spark_submit = 'cd $HOME/.envs/cc/CrymeClarity/crymepipelines/dist && spark-submit --py-files shared.zip,tasks.zip,libs.zip '
+local_python = 'cd $HOME/.envs/cc/CrymeClarity/crymepipelines/dist && $HOME/.envs/cc/bin/python '
 
-dag = DAG('train_cryme_classifier', default_args=default_args, schedule_interval='*/5 * * * *', catchup=False)
+dag = DAG('train_cryme_classifier', default_args=default_args, schedule_interval='* 12 * * *', catchup=False)
 
 # t1, t2 and t3 are examples of tasks created by instantiating operators
 
 t1 = BashOperator(
     task_id='generate_location_time_samples',
-    bash_command=base_spark_submit + 'run.py --task GenerateLocationTimeSamples',
+    bash_command=local_python + 'run.py --task GenerateLocationTimeSamples',
     dag=dag)
 
 t2 = BashOperator(
@@ -42,7 +43,7 @@ t4 = BashOperator(
 
 t5 = BashOperator(
     task_id='train_model',
-    bash_command=base_spark_submit + 'run.py --task TrainCrymeClassifier',
+    bash_command=local_python + 'run.py --task TrainCrymeClassifier',
     dag=dag)
 
 t2.set_upstream(t1)

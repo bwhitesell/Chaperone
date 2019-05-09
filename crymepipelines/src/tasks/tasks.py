@@ -1,6 +1,6 @@
+import csv
 from datetime import datetime, timedelta
 import os
-import pandas as pd
 import pickle as p
 import shutil
 
@@ -53,8 +53,33 @@ class EngineerFeatures(BaseCrymeTask):
         df = df.withColumn('time_minutes', ts_to_minutes_in_day_udf(df.timestamp))
         df = df.withColumn('hour', ts_to_hour_of_day_udf(df.timestamp))
         df = df.withColumn('day_of_week', ts_to_day_of_week_udf(df.timestamp))
-        df.toPandas().to_csv(self.output_file, index=False)
+        df = df.collect()
+        with open(self.output_file, 'w') as output:
+            writer = csv.writer(output, delimiter=',',)
+            writer.writerow(
+                ['id', 'latitude', 'longitude', 'timestamp', 'lat_bb', 'lon_bb',
+                 'timestamp_unix', 'count', 'crime_occ', 'time_minutes', 'day_of_week']
+            )  # headers
+            for row in df:
+                writer.writerow(self.row_to_list(row))
+
         shutil.rmtree(self.input_file)
+
+    @staticmethod
+    def row_to_list(row):
+        return [
+            row.id,
+            row.latitude,
+            row.longitude,
+            row.timestamp,
+            row.lat_bb,
+            row.lon_bb,
+            row.timestamp_unix,
+            row.count,
+            row.crime_occ,
+            row.time_minutes,
+            row.day_of_week,
+        ]
 
 
 class TrainCrymeClassifier(BaseCrymeTask):
@@ -63,6 +88,7 @@ class TrainCrymeClassifier(BaseCrymeTask):
     output_file = BIN_DIR + '/cryme_classifier_' + str(datetime.now().date()) + '.p'
 
     def run(self):
+        import pandas as pd
         from sklearn.ensemble import RandomForestClassifier
         from sklearn.metrics import log_loss
         features = ['longitude', 'latitude', 'time_minutes', 'day_of_week']

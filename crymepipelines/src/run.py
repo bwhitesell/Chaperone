@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import argparse
-import importlib
 import os
-import pyspark
 import sys
 
 try:
@@ -28,17 +26,18 @@ def import_rel_modules():
     else:
         sys.path.insert(0, os.path.abspath(__file__) + '/shared')
 
+    if os.path.exists('libs.zip'):
+        sys.path.insert(0, 'libs.zip')
+    else:
+        sys.path.insert(0, os.path.abspath(__file__) + '/libs')
+
 
 if __name__ == "__main__":
     import_rel_modules()
     from tasks import tasks as tasks
-    from shared.settings import BASE_DIR
     parser = argparse.ArgumentParser(description='Run a CrymeTask')
     parser.add_argument('--task', type=str, required=True, dest='task_name', help="The name of the CrymeTask class")
     args = parser.parse_args()
-    print(args.task_name)
-    print(tasks.BuildDataset)
-    print(BASE_DIR)
 
     # check for arguments`
     if len(sys.argv) < 2:

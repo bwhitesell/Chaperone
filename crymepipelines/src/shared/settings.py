@@ -11,9 +11,9 @@ else:
 TMP_DIR = os.path.abspath(BASE_DIR + '/..') + '/tmp'
 BIN_DIR = os.path.abspath(BASE_DIR + '/../..') + '/bin'
 
-DB_URL = os.environ.get('CRYMEPIPELINES_DB_URL')
-FEEDER_DB_URL = os.environ.get('CRYMEFEEDER_DB_URL')
-CRYMEWEB_DB_URL = os.environ.get('CRYMEWEB_DB_URL')
+DB_URL = 'mysql://root@localhost/crymepipelines?serverTimezone=UTC'
+FEEDER_DB_URL = 'mongodb://localhost:27017/crymeclarity'
+CRYMEWEB_DB_URL = 'mysql://root@localhost/crymeweb'
 
 # CrymeFeeder Trust Delay
 # often crimes are reported and uploaded to the api well after the fact, this parameter gives the feeder a buffer
@@ -29,7 +29,6 @@ START_DATE = datetime(year=2018, month=4, day=1).date()
 
 from shared.db.mysql.connection import CrymePipelinesMySqlConn
 from shared.db.mongo.connection import CrymePipelinesMongoConn
-
 cp_conn = CrymePipelinesMySqlConn()
 cf_conn = CrymePipelinesMongoConn()
 

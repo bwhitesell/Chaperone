@@ -19,7 +19,38 @@ local_python = 'cd $HOME/.envs/cc/CrymeClarity/crymepipelines/dist && $HOME/.env
 
 dag = DAG('train_cryme_classifier', default_args=default_args, schedule_interval='* 12 * * *', catchup=False)
 
-# t1, t2 and t3 are examples of tasks created by instantiating operators
+t1 = BashOperator(
+    task_id='generate_location_time_samples',
+    bash_command=local_python + 'run.py --task GenerateLocationTimeSamples',
+    dag=dag)
+
+t2 = BashOperator(
+    task_id='build_full_dataset',
+    bash_command=base_spark_submit + 'run.py --task BuildFullDataset',
+    dag=dag)
+
+t3 = BashOperator(
+    task_id='clean_dataset',
+    bash_command=base_spark_submit + 'run.py --task CleanDataset',
+    dag=dag)
+
+t4 = BashOperator(
+    task_id='engineer_features',
+    bash_command=base_spark_submit + 'run.py --task EngineerFeatures',
+    dag=dag)
+
+t5 = BashOperator(
+    task_id='train_model',
+    bash_command=local_python + 'run.py --task TrainCrymeClassifier',
+    dag=dag)
+
+t2.set_upstream(t1)
+t3.set_upstream(t2)
+t4.set_upstream(t3)
+t5.set_upstream(t4)
+
+
+dag_eval = DAG('eval_cryme_classifier', default_args=default_args, schedule_interval='* 12 * * *', catchup=False)
 
 t1 = BashOperator(
     task_id='generate_location_time_samples',
@@ -27,8 +58,8 @@ t1 = BashOperator(
     dag=dag)
 
 t2 = BashOperator(
-    task_id='build_dataset',
-    bash_command=base_spark_submit + 'run.py --task BuildDataset',
+    task_id='build_full_dataset',
+    bash_command=base_spark_submit + 'run.py --task BuildRecentDataset',
     dag=dag)
 
 t3 = BashOperator(

@@ -1,17 +1,17 @@
 import csv
 from datetime import datetime, timedelta
-import os
 import pickle as p
 import shutil
 
 from shared.objects.samples import SamplesManager
 from shared.settings import CF_TRUST_DELAY, START_DATE, cf_conn, cp_conn, TMP_DIR, BIN_DIR
-from .base import BaseCrymeTask
+from .base import BaseCrymeTask, NativeCrymeTask
 from .mixins import SearchForCrimesMixin
 from .mappings import crime_occ_udf, ts_to_minutes_in_day_udf, ts_to_hour_of_day_udf, ts_to_day_of_week_udf
 
 
-class GenerateLocationTimeSamples(BaseCrymeTask):
+class GenerateLocationTimeSamples(NativeCrymeTask):
+
     def run(self):
         sm = SamplesManager()
         cf_freshness = cf_conn.get_recency_data()
@@ -23,11 +23,28 @@ class GenerateLocationTimeSamples(BaseCrymeTask):
             raise ValueError('Invalid Update Date Specified.')
 
 
-class BuildDataset(SearchForCrimesMixin):
+class BuildFullDataset(SearchForCrimesMixin):
     output_file = TMP_DIR + '/features.parquet'
 
     def run(self):
         events_sample = self.load_df_from_db('location_time_samples')
+        features_ds = self.search_for_crimes(events_sample)
+        features_ds.write.parquet(TMP_DIR + '/features.parquet')
+
+
+class BuildRecentDataset(SearchForCrimesMixin):
+    output_file = TMP_DIR + '/features.parquet'
+
+    def run(self):
+        cf_freshness = cf_conn.get_recency_data()
+        update_date = (cf_freshness - CF_TRUST_DELAY).date()
+        print(update_date)
+        if (update_date >= datetime.now().date()) or (update_date < START_DATE):
+            raise ValueError('Invalid Update Date Specified.')
+
+        events_sample = self.load_df_from_db('location_time_samples')
+        events_sample = events_sample.filter(events_sample.timestamp < update_date + timedelta(days=1))
+        events_sample = events_sample.filter(events_sample.timestamp > update_date)
         features_ds = self.search_for_crimes(events_sample)
         features_ds.write.parquet(TMP_DIR + '/features.parquet')
 
@@ -82,15 +99,12 @@ class EngineerFeatures(BaseCrymeTask):
         ]
 
 
-class TrainCrymeClassifier(BaseCrymeTask):
-    task_type = 'single'
+class TrainCrymeClassifier(NativeCrymeTask):
     input_file = TMP_DIR + '/final_dataset.csv'
     output_file = BIN_DIR + '/cryme_classifier_' + str(datetime.now().date()) + '.p'
 
     def run(self):
-        import pandas as pd
-        from sklearn.ensemble import RandomForestClassifier
-        from sklearn.metrics import log_loss
+
         features = ['longitude', 'latitude', 'time_minutes', 'day_of_week']
         target = 'crime_occ'
 
@@ -105,6 +119,32 @@ class TrainCrymeClassifier(BaseCrymeTask):
         rfc.fit(train_ds[features], train_ds[target])
         y_est = rfc.predict_proba(test_ds[features])
         ll = log_loss(test_ds[target], y_est)
-        print(ll)
+
         p.dump(rfc, open(self.output_file, 'wb'))
-        os.remove(self.input_file)
+        #os.remove(self.input_file)
+
+        cursor = cp_conn.cursor()
+        cursor.execute(
+            f'CALL AddNewModel({round(ll, 2)}, {train_ds.shape[0]}, {test_ds.shape[0]}, "{self.output_file}")'
+        )
+        cp_conn.conn.commit()
+
+
+class EvalCrymeClassifier(NativeCrymeTask):
+
+    def run(self):
+        features = ['longitude', 'latitude', 'time_minutes', 'day_of_week']
+        target = 'crime_occ'
+        df = pd.read_csv(self.input_file)
+        cursor = cp_conn.cursor()
+        cursor.execute('SELECT * FROM cryme_classifiers;')
+        models = cursor.fetchall()
+
+        for model in models:
+            model_obj = p.load(open(model['saved_to'], 'rb'))
+            y_est = model_obj.predict_proba(df[features])
+            ll = log_loss(df[target], y_est)
+
+
+
+

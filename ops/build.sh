@@ -60,6 +60,7 @@ sudo cp $HOME/.envs/cc/CrymeClarity/ops/mysql/my.cnf /etc/mysql/
 sudo systemctl restart mysql
 
 #MONGODB
+sudo cp $HOME/.envs/cc/CrymeClarity/ops/mongodb/mongod.conf /etc
 sudo systemctl restart mongodb
 
 #NGINX

@@ -28,3 +28,14 @@ class BaseCrymeTask:
             "uri",
             self.feeder_db_url + '.' + collection
         ).load()
+
+
+class NativeCrymeTask:
+
+    def __init__(self):
+        import pandas as pd
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.metrics import log_loss
+        self.db_url = DB_URL
+        self.feeder_db_url = FEEDER_DB_URL
+        self.web_db_url = CRYMEWEB_DB_URL

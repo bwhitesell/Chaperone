@@ -6,7 +6,8 @@ by crymeweb.
 
 The functional object in CrymePipelines is a `CrymeTask`. CrymeTasks are defined in the
  `src/tasks.py` file and scheduled via an airflow DAG. CrymeTasks are built by defining a
- class that inherits `tasks.base.BaseCrymeTask` (as well as any mixins) and has a single 
+ class in the `src/tasks.py` file. If the task will utilize pyspark functionality, then it must 
+ inherit from `tasks.base.BaseCrymeTask` (as well as any mixins). Each class should have a single 
  `run` method that is run on execution of the task.
  
  

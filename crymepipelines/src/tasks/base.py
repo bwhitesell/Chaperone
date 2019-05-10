@@ -9,10 +9,10 @@ class BaseCrymeTask:
         self.web_db_url = CRYMEWEB_DB_URL
 
 
-class SparkCrymeTask:
+class SparkCrymeTask(BaseCrymeTask):
 
     def __init__(self, spark_session):
-        self.spark = spark_session  # not all tasks use spark but the session is there regardless.
+        self.spark = spark_session
         super().__init__()
 
     def load_df_from_db(self, table):
@@ -36,7 +36,7 @@ class SparkCrymeTask:
         ).load()
 
 
-class NativeCrymeTask:
+class NativeCrymeTask(BaseCrymeTask):
 
     def __init__(self, spark):
         import pandas

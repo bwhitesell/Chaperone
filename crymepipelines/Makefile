@@ -4,4 +4,4 @@ CrymePipelines:
 	mkdir ./dist/tmp
 	cp ./src/run.py ./dist
 	cd ./src && zip -r ../dist/tasks.zip ./tasks && zip -r ../dist/shared.zip ./shared
-	cd ./src/libs && zip -r ../../dist/libs.zip .
+	cd ./src/lib && zip -r ../../dist/libs.zip .

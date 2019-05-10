@@ -14,35 +14,41 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-base_spark_submit = 'cd $HOME/.envs/cc/CrymeClarity/crymepipelines/dist && spark-submit --py-files shared.zip,tasks.zip,libs.zip '
-local_python = 'cd $HOME/.envs/cc/CrymeClarity/crymepipelines/dist && $HOME/.envs/cc/bin/python '
+base_dir_command = 'cd $HOME/.envs/cc/CrymeClarity/crymepipelines/dist'
 
-dag = DAG('train_cryme_classifier', default_args=default_args, schedule_interval='* 12 * * *', catchup=False)
+cli_args = {
+    'spark-submit': base_dir_command + ' && spark-submit --py-files shared.zip,tasks.zip,libs.zip ',
+    'local_python_exec': base_dir_command + ' && $HOME/.envs/cc/bin/python ',
+ }
+
+# TRAIN CRYME CLASSIFIER DAG #
+train_cryme_classifier_dag = DAG('train_cryme_classifier', default_args=default_args,
+                                 schedule_interval='* * 5 * *', catchup=False)
 
 t1 = BashOperator(
     task_id='generate_location_time_samples',
-    bash_command=local_python + 'run.py --task GenerateLocationTimeSamples',
-    dag=dag)
+    bash_command=cli_args['local_python_exec'] + 'run.py --task GenerateLocationTimeSamples',
+    dag=train_cryme_classifier_dag)
 
 t2 = BashOperator(
     task_id='build_full_dataset',
-    bash_command=base_spark_submit + 'run.py --task BuildFullDataset',
-    dag=dag)
+    bash_command=cli_args['spark-submit'] + 'run.py --task BuildFullDataset',
+    dag=train_cryme_classifier_dag)
 
 t3 = BashOperator(
     task_id='clean_dataset',
-    bash_command=base_spark_submit + 'run.py --task CleanDataset',
-    dag=dag)
+    bash_command=cli_args['spark-submit'] + 'run.py --task CleanDataset',
+    dag=train_cryme_classifier_dag)
 
 t4 = BashOperator(
     task_id='engineer_features',
-    bash_command=base_spark_submit + 'run.py --task EngineerFeatures',
-    dag=dag)
+    bash_command=cli_args['spark-submit'] + 'run.py --task EngineerFeatures',
+    dag=train_cryme_classifier_dag)
 
 t5 = BashOperator(
     task_id='train_model',
-    bash_command=local_python + 'run.py --task TrainCrymeClassifier',
-    dag=dag)
+    bash_command=cli_args['local_python_exec'] + 'run.py --task TrainCrymeClassifier',
+    dag=train_cryme_classifier_dag)
 
 t2.set_upstream(t1)
 t3.set_upstream(t2)
@@ -50,34 +56,36 @@ t4.set_upstream(t3)
 t5.set_upstream(t4)
 
 
-dag_eval = DAG('eval_cryme_classifier', default_args=default_args, schedule_interval='* 12 * * *', catchup=False)
+# EVAL CRYME CLASSIFIER DAG #
+eval_cryme_classifier_dag = DAG('eval_cryme_classifier', default_args=default_args,
+                                schedule_interval='* 12 * * *', catchup=False)
 
-t1 = BashOperator(
+t6 = BashOperator(
     task_id='generate_location_time_samples',
-    bash_command=local_python + 'run.py --task GenerateLocationTimeSamples',
-    dag=dag)
+    bash_command=cli_args['local_python_exec'] + 'run.py --task GenerateLocationTimeSamples',
+    dag=eval_cryme_classifier_dag)
 
-t2 = BashOperator(
-    task_id='build_full_dataset',
-    bash_command=base_spark_submit + 'run.py --task BuildRecentDataset',
-    dag=dag)
+t7 = BashOperator(
+    task_id='build_recent_dataset',
+    bash_command=cli_args['spark-submit'] + 'run.py --task BuildRecentDataset',
+    dag=eval_cryme_classifier_dag)
 
-t3 = BashOperator(
+t8 = BashOperator(
     task_id='clean_dataset',
-    bash_command=base_spark_submit + 'run.py --task CleanDataset',
-    dag=dag)
+    bash_command=cli_args['spark-submit'] + 'run.py --task CleanDataset',
+    dag=eval_cryme_classifier_dag)
 
-t4 = BashOperator(
+t9 = BashOperator(
     task_id='engineer_features',
-    bash_command=base_spark_submit + 'run.py --task EngineerFeatures',
-    dag=dag)
+    bash_command=cli_args['spark-submit'] + 'run.py --task EngineerFeatures',
+    dag=eval_cryme_classifier_dag)
 
-t5 = BashOperator(
+t10 = BashOperator(
     task_id='train_model',
-    bash_command=local_python + 'run.py --task TrainCrymeClassifier',
-    dag=dag)
+    bash_command=cli_args['local_python_exec'] + 'run.py --task EvalCrymeClassifier',
+    dag=eval_cryme_classifier_dag)
 
-t2.set_upstream(t1)
-t3.set_upstream(t2)
-t4.set_upstream(t3)
-t5.set_upstream(t4)
+t7.set_upstream(t6)
+t8.set_upstream(t7)
+t9.set_upstream(t8)
+t10.set_upstream(t9)

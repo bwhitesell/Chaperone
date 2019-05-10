@@ -3,11 +3,17 @@ from shared.settings import DB_URL, FEEDER_DB_URL, CRYMEWEB_DB_URL
 
 class BaseCrymeTask:
 
-    def __init__(self, spark_session):
-        self.spark = spark_session  # not all tasks use spark but the session is there regardless.
+    def __init__(self):
         self.db_url = DB_URL
         self.feeder_db_url = FEEDER_DB_URL
         self.web_db_url = CRYMEWEB_DB_URL
+
+
+class SparkCrymeTask:
+
+    def __init__(self, spark_session):
+        self.spark = spark_session  # not all tasks use spark but the session is there regardless.
+        super().__init__()
 
     def load_df_from_db(self, table):
         return self.spark.read.format("jdbc").options(
@@ -33,9 +39,12 @@ class BaseCrymeTask:
 class NativeCrymeTask:
 
     def __init__(self, spark):
-        import pandas as pd
+        import pandas
         from sklearn.ensemble import RandomForestClassifier
         from sklearn.metrics import log_loss
-        self.db_url = DB_URL
-        self.feeder_db_url = FEEDER_DB_URL
-        self.web_db_url = CRYMEWEB_DB_URL
+
+        self._local_mod_access = {}
+        for _module in [pandas, RandomForestClassifier, log_loss]:
+            self._local_mod_access[_module.__name__] = _module
+
+        super().__init__()

@@ -2,11 +2,11 @@ from datetime import datetime, timedelta
 import pyspark.sql.functions as psf
 from pyspark.sql.functions import col
 
-from .base import BaseCrymeTask
+from .base import SparkCrymeTask
 from .mappings import ts_conv, t_occ_conv, actb_lat, actb_lon, space_dist
 
 
-class SearchForCrimesMixin(BaseCrymeTask):
+class SearchForCrimesMixin(SparkCrymeTask):
     def search_for_crimes(self, events_sample):
         crime_incidents = self.load_df_from_crymefeeder("incidents")
 

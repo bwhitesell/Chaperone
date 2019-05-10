@@ -40,8 +40,8 @@ cp $HOME/spark/conf/spark-defaults.conf.template $HOME/spark/conf/spark-defaults
 echo 'spark.io.compression.codec org.apache.spark.io.SnappyCompressionCodec' | sudo tee -a /$HOME/spark/conf/spark-defaults.conf
 
 # Give Spark 25GB of RAM, use Python3
-echo "spark.driver.memory 30g" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
-echo "spark.executor.cores 12" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
+echo "spark.driver.memory 2g" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
+echo "spark.executor.cores 2" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
 echo "PYSPARK_PYTHON=python3" | sudo tee -a $SPARK_HOME/conf/spark-env.sh
 echo "PYSPARK_DRIVER_PYTHON=python3" | sudo tee -a $SPARK_HOME/conf/spark-env.sh
 

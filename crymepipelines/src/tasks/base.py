@@ -32,7 +32,7 @@ class BaseCrymeTask:
 
 class NativeCrymeTask:
 
-    def __init__(self):
+    def __init__(self, spark):
         import pandas as pd
         from sklearn.ensemble import RandomForestClassifier
         from sklearn.metrics import log_loss

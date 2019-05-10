@@ -25,6 +25,16 @@ CREATE TABLE IF NOT EXISTS cryme_classifiers (
   PRIMARY KEY (id)
 ) ENGINE=INNODB;
 
+CREATE TABLE IF NOT EXISTS model_performance (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  model_id INT NOT NULL,
+  log_loss FLOAT(53) NOT NULL,
+  n_samples INT NOT NULL,
+  data_eval_date DATETIME NOT NULL,
+  eval_date DATETIME NOT NULL,
+  FOREIGN KEY fk_model_id(model_id) REFERENCES cryme_classifiers(id)
+) ENGINE=INNODB;
+
 DELIMITER //
 CREATE PROCEDURE AddNewModel(log_loss_val FLOAT(53), n_samples_train_val INT, n_samples_test_val INT, saved_to_val VARCHAR(255))
   BEGIN
@@ -32,6 +42,15 @@ CREATE PROCEDURE AddNewModel(log_loss_val FLOAT(53), n_samples_train_val INT, n_
     (log_loss, n_samples_train, n_samples_test, model_generated_on, saved_to)
     VALUES (log_loss_val, n_samples_train_val, n_samples_test_val, CURRENT_TIMESTAMP(), saved_to_val);
  END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE eval_model(model_id_val INT, log_loss_val FLOAT(53), n_samples_val INT, data_eval_date_val TIMESTAMP)
+  BEGIN
+  INSERT INTO model_performance
+    (model_id, log_loss, n_samples, data_eval_date, eval_date)
+    VALUES (model_id_val, log_loss_val, n_samples_val, data_eval_date_val, CURRENT_TIMESTAMP());
+  END //
 DELIMITER ;
 
 

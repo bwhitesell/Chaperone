@@ -38,7 +38,6 @@ class BuildRecentDataset(SearchForCrimesMixin):
     def run(self):
         cf_freshness = cf_conn.get_recency_data()
         update_date = (cf_freshness - CF_TRUST_DELAY).date()
-        print(update_date)
         if (update_date >= datetime.now().date()) or (update_date < START_DATE):
             raise ValueError('Invalid Update Date Specified.')
 
@@ -104,6 +103,9 @@ class TrainCrymeClassifier(NativeCrymeTask):
     output_file = BIN_DIR + '/cryme_classifier_' + str(datetime.now().date()) + '.p'
 
     def run(self):
+        import pandas as pd
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.metrics import log_loss
 
         features = ['longitude', 'latitude', 'time_minutes', 'day_of_week']
         target = 'crime_occ'
@@ -131,19 +133,29 @@ class TrainCrymeClassifier(NativeCrymeTask):
 
 
 class EvalCrymeClassifier(NativeCrymeTask):
+    input_file = TMP_DIR + '/final_dataset.csv'
 
     def run(self):
+        import pandas as pd
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.metrics import log_loss
+
         features = ['longitude', 'latitude', 'time_minutes', 'day_of_week']
         target = 'crime_occ'
         df = pd.read_csv(self.input_file)
         cursor = cp_conn.cursor()
         cursor.execute('SELECT * FROM cryme_classifiers;')
         models = cursor.fetchall()
-
         for model in models:
             model_obj = p.load(open(model['saved_to'], 'rb'))
             y_est = model_obj.predict_proba(df[features])
             ll = log_loss(df[target], y_est)
+
+            cursor.execute(
+                f'CALL eval_model({model["id"]}, {round(ll, 2)}, {df.shape[0]}, "{(cf_conn.get_recency_data() - CF_TRUST_DELAY).date()}")'
+            )
+            cp_conn.conn.commit()
+
 
 
 

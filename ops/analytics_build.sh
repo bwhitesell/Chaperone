@@ -15,21 +15,21 @@ yes Y | sudo apt-get install mongodb mysql-server libmysqlclient-dev python3-dev
 sudo add-apt-repository ppa:openjdk-r/ppa
 sudo apt-get update
 sudo apt-get install -y openjdk-8-jdk
-
+echo "# Java" | sudo tee -a $HOME/.bashrc
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-echo "export JAVA_HOME=/usr/libs/jvm/java-8-openjdk-amd64" | sudo tee -a $HOME/.bashrc
+echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" | sudo tee -a $HOME/.bashrc
 
 # install scala (yuck)
 sudo apt-get install scala
 
 
 # Install Spark
-curl -Lko /tmp/spark-2.4.2-bin-without-hadoop.tgz http://apache.mirrors.lucidnetworks.net/spark/spark-2.4.2/spark-2.4.2-bin-hadoop2.7.tgz
+curl -Lko /tmp/spark-2.4.3-bin-hadoop2.7.tgz http://apache.mirrors.lucidnetworks.net/spark/spark-2.4.3/spark-2.4.3-bin-hadoop2.7.tgz
 mkdir -p $HOME/spark
 cd $HOME
-tar -xvf /tmp/spark-2.4.2-bin-without-hadoop.tgz -C spark --strip-components=1
+tar -xvf /tmp/spark-2.4.3-bin-hadoop2.7.tgz -C $HOME/spark --strip-components=1
 
-echo "# Spark environment setup" | sudo tee -a $HOME/.bashrc
+echo "# Spark" | sudo tee -a $HOME/.bashrc
 export SPARK_HOME=$HOME/spark
 echo 'export SPARK_HOME=$HOME/spark' | sudo tee -a $HOME/.bashrc
 export PATH=$PATH:$SPARK_HOME/bin
@@ -39,7 +39,7 @@ echo 'export PATH=$PATH:$SPARK_HOME/bin' | sudo tee -a $HOME/.bashrc
 cp $HOME/spark/conf/spark-defaults.conf.template $HOME/spark/conf/spark-defaults.conf
 echo 'spark.io.compression.codec org.apache.spark.io.SnappyCompressionCodec' | sudo tee -a /$HOME/spark/conf/spark-defaults.conf
 
-# Give Spark 25GB of RAM, use Python3
+# Give Spark 2GB of RAM, use Python3
 echo "spark.driver.memory 2g" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
 echo "spark.executor.cores 2" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
 echo "PYSPARK_PYTHON=python3" | sudo tee -a $SPARK_HOME/conf/spark-env.sh
@@ -88,8 +88,14 @@ echo "AIRFLOW_HOME=$HOME/airflow" | sudo tee -a $HOME/.envs/cc/postactivate
 export AIRFLOW_HOME=$HOME/airflow
 
 # airflow
-workon cc & pip install gunicorn & pip install airflow
-sudo mkdir /etc/sysconfig/
+echo "# Airflow" | sudo tee -a $HOME/.profile
+echo "export AIRFLOW_HOME=$HOME/airflow" | sudo tee -a $HOME/.profile
+export AIRFLOW_HOME=$HOME/airflow
+workon cc & pip install gunicorn & pip install apache-airflow
+sudo mkdir /etc/sysconfig
+sudo mkdir /run/airflow
+sudo chown -R $USER /run/airflow
+
 sudo cp $HOME/.envs/cc/CrymeClarity/ops/airflow/airflow-scheduler.service /etc/systemd/system
 sudo cp $HOME/.envs/cc/CrymeClarity/ops/airflow/airflow-webserver.service /etc/systemd/system
 sudo cp $HOME/.envs/cc/CrymeClarity/ops/airflow/airflow.conf /etc/tmpfiles.d
@@ -100,5 +106,12 @@ echo "SPARK_HOME=$SPARK_HOME" | sudo tee -a /etc/sysconfig/airflow
 echo "AIRFLOW_CONFIG=$AIRFLOW_HOME/airflow.cfg" | sudo tee -a /etc/sysconfig/airflow
 echo "PATH=$PATH" | sudo tee -a /etc/sysconfig/airflow
 
-#create a symlink
+mkdir $AIRFLOW_HOME/dags
 ln -s $HOME/.envs/cc/CrymeClarity/crymepipelines/cp_dags.py $AIRFLOW_HOME/dags
+
+cd $AIRFLOW_HOME
+airflow initdb
+
+
+sudo systemctl start airflow-webserver
+sudo systemctl start airflow-scheduler

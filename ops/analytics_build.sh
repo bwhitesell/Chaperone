@@ -115,3 +115,10 @@ airflow initdb
 
 sudo systemctl start airflow-webserver
 sudo systemctl start airflow-scheduler
+
+
+#Setup crymepipelines
+mysql -u root -e "CREATE DATABASE crymepipelines";
+mysql -u root crymepipelines < $HOME/.envs/cc/CrymeClarity/crymepipelines/migrations/crymePipelines.sql
+cd $HOME/.envs/cc/CrymeClarity/crymepipelines/
+make CrymePipelines

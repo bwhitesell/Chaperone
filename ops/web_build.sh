@@ -65,6 +65,7 @@ sudo systemctl enable nginx.service
 
 #GUNICORN
 gunicorn/gunicorn.socket /etc/systemd/system
+sudo cp $HOME/.envs/cc/CrymeClarity/ops/gunicorn/gunicorn.socket /etc/systemd/system
 sudo cp $HOME/.envs/cc/CrymeClarity/ops/gunicorn/gunicorn.service /etc/systemd/system
 
 sudo touch /etc/tmpfiles.d/gunicorn.conf

@@ -22,22 +22,11 @@ export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" | sudo tee -a $HOME/.bashrc
 
 
-# install scala (yuck)
-sudo apt-get install scala
-
-
-# sbt Installation
-echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
-sudo apt-get update
-sudo apt-get install sbt
-
-
 # Install Spark
-curl -Lko /tmp/spark-2.3.3-bin-hadoop2.7.tgz https://www-us.apache.org/dist/spark/spark-2.3.3/spark-2.3.3-bin-hadoop2.7.tgz
+curl -Lko /tmp/spark-2.4.2-bin-hadoop2.7.tgz https://archive.apache.org/dist/spark/spark-2.4.2/spark-2.4.2-bin-hadoop2.7.tgz
 mkdir -p $HOME/spark
 cd $HOME
-tar -xvf /tmp/spark-2.3.3-bin-hadoop2.7.tgz -C $HOME/spark --strip-components=1
+tar -xvf /tmp/spark-2.4.2-bin-hadoop2.7.tgz -C $HOME/spark --strip-components=1
 
 echo "# Spark environment setup" | sudo tee -a $HOME/.bashrc
 export SPARK_HOME=$HOME/spark
@@ -49,7 +38,7 @@ echo 'export PATH=$PATH:$SPARK_HOME/bin' | sudo tee -a $HOME/.bashrc
 cp $HOME/spark/conf/spark-defaults.conf.template $HOME/spark/conf/spark-defaults.conf
 echo 'spark.io.compression.codec org.apache.spark.io.SnappyCompressionCodec' | sudo tee -a /$HOME/spark/conf/spark-defaults.conf
 
-# Give Spark 25GB of RAM, use Python3
+# Give Spark 2GB of RAM, use Python3
 echo "spark.driver.memory 2g" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
 echo "spark.executor.cores 2" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
 echo "PYSPARK_PYTHON=python3" | sudo tee -a $SPARK_HOME/conf/spark-env.sh
@@ -141,7 +130,7 @@ sudo systemctl start airflow-webserver
 sudo systemctl start airflow-scheduler
 
 # MYSQL
-sudo cp $HOME/.envs/cc/CrymeClarity/ops/mysql/my.cnf /etc/mysql/
+sudo cp $HOME/.envs/cc/CrymeClarity/ops/mysql/analytics_my.cnf /etc/mysql/my.cnf
 sudo systemctl restart mysql
 
 #MONGODB

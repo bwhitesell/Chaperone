@@ -2,20 +2,19 @@ import pymysql
 import time
 from urllib.parse import urlparse
 
-from shared.settings import DB_URL
-
 
 class CrymePipelinesMySqlConn:
     """
       A Wrapping class around the pymysql connection object to improve resilience of the pipelines
       and manage the config around connection setup.
     """
-    def __init__(self):
+    def __init__(self, uri):
         self.conn = None
+        self.uri = uri
         self.connect()
 
     def connect(self):
-        conn_params = urlparse(DB_URL)
+        conn_params = urlparse(self.uri)
         self.conn = pymysql.connect(
             host=conn_params.hostname,
             port=conn_params.port,
@@ -49,3 +48,5 @@ class CrymePipelinesMySqlConn:
 
         if attempt == attempts:
             raise Exception("Unable to connect to db.")
+
+

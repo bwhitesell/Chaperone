@@ -15,16 +15,16 @@ class SparkCrymeTask(BaseCrymeTask):
         self.spark = spark_session
         super().__init__()
 
-    def load_df_from_db(self, table):
+    def load_df_from_cp(self, table):
         return self.spark.read.format("jdbc").options(
             url="jdbc:" + self.db_url,
             driver="com.mysql.jdbc.Driver",
             dbtable=table,
         ).load()
 
-    def write_to_db(self, df, table):
+    def write_to_cw(self, df, table):
         df.write.format('jdbc').options(
-            url="jdbc:" + self.db_url,
+            url="jdbc:" + self.web_db_url,
             driver='com.mysql.jdbc.Driver',
             dbtable=table,
         ).mode('overwrite').save()

@@ -7,7 +7,8 @@ import shutil
 from shared.objects.samples import SamplesManager
 from shared.settings import CF_TRUST_DELAY, START_DATE, cf_conn, cp_conn, TMP_DIR, BIN_DIR
 from .base import SparkCrymeTask, NativeCrymeTask
-from .mappings import crime_occ_udf, ts_to_minutes_in_day_udf, ts_to_hour_of_day_udf, ts_to_day_of_week_udf
+from .constants import safety_rel_crimes
+from .mappings import crime_occ_udf, ts_to_minutes_in_day_udf, ts_to_hour_of_day_udf, ts_to_day_of_week_udf, ts_conv
 from .mixins import SearchForCrimesMixin
 
 
@@ -152,6 +153,19 @@ class EvalCrymeClassifier(NativeCrymeTask):
             cp_conn.conn.commit()
 
 
+class CleanAndPipeRecentCrimeIncidents(SparkCrymeTask):
+    def run(self):
+        raw_crime_incidents = self.load_df_from_crymefeeder("incidents")
+        crime_incidents = raw_crime_incidents.withColumn('date_occ', ts_conv(raw_crime_incidents.date_occ))
+        crime_incidents = crime_incidents.filter(crime_incidents.date_occ > datetime.now().date() - timedelta(days=30))
+        crime_incidents = crime_incidents.filter(crime_incidents.crm_cd.isin(list(safety_rel_crimes.keys())))
+
+        crime_incidents = crime_incidents.withColumn('Latitude', crime_incidents.location_1.coordinates[0])
+        crime_incidents = crime_incidents.withColumn('Longitude', crime_incidents.location_1.coordinates[1])
+        crime_incidents = crime_incidents.select(
+            ['_id', 'crm_cd', 'crm_cd_desc', 'date_occ', 'time_occ', 'premis_desc', 'longitude', 'latitude']
+        )
+        self.write_to_cw(crime_incidents, 'crime_crimes')
 
 
 

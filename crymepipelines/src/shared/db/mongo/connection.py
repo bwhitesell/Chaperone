@@ -1,19 +1,18 @@
 from datetime import datetime
 import pymongo
 
-from shared.settings import FEEDER_DB_URL
-
 
 class CrymePipelinesMongoConn:
     """
       A Wrapping class around the mongoclient object to improve resilience of the pipelines
       and manage the config around connection setup.
     """
-    def __init__(self):
+    def __init__(self, uri):
+        self.uri = uri
         self._establish_connection()
 
     def _establish_connection(self):
-        self.mc_client = pymongo.MongoClient(FEEDER_DB_URL)['crymeclarity']
+        self.mc_client = pymongo.MongoClient(self.uri)['crymeclarity']
 
     def get_recency_data(self):
         return self.cla_timestamp_to_datetime(

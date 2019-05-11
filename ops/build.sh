@@ -103,7 +103,11 @@ workon cc & pip install gunicorn & pip install apache-airflow
 sudo mkdir /etc/sysconfig
 sudo mkdir /run/airflow
 sudo chown -R $USER /run/airflow
-mkdir $AIRFLOW_HOME/dags
+sudo mkdir $AIRFLOW_HOME/dags
+
+# Give to user
+sudo chown -R $USER $HOME/airflow
+sudo chgrp -R $USER $HOME/airflow
 
 ### ADDING CONFIGURATION TO MYSQL, MONGODB, NGINX, GUNICORN, AIRFLOW ###
 cd $HOME/.envs/cc
@@ -120,7 +124,7 @@ echo "SPARK_HOME=$SPARK_HOME" | sudo tee -a /etc/sysconfig/airflow
 echo "AIRFLOW_CONFIG=$AIRFLOW_HOME/airflow.cfg" | sudo tee -a /etc/sysconfig/airflow
 echo "PATH=$PATH" | sudo tee -a /etc/sysconfig/airflow
 
-ln -s $HOME/.envs/cc/CrymeClarity/crymepipelines/cp_dags.py $AIRFLOW_HOME/dags
+sudo ln -s $HOME/.envs/cc/CrymeClarity/crymepipelines/cp_dags.py $AIRFLOW_HOME/dags
 
 cd $AIRFLOW_HOME
 airflow initdb
@@ -142,7 +146,7 @@ sudo cp $HOME/.envs/cc/CrymeClarity/ops/nginx/nginx.conf /etc/nginx/
 sudo systemctl enable nginx.service
 
 #GUNICORN
-gunicorn/gunicorn.socket /etc/systemd/system
+sudo cp $HOME/.envs/cc/CrymeClarity/ops/gunicorn/gunicorn.socket /etc/systemd/system
 sudo cp $HOME/.envs/cc/CrymeClarity/ops/gunicorn/gunicorn.service /etc/systemd/system
 
 sudo touch /etc/tmpfiles.d/gunicorn.conf

@@ -8,7 +8,7 @@ from regions.models import GeometricRegion
 
 
 geometry_files = [{
-    'path': os.path.abspath(os.getcwd() + '/objects/migrations/fixtures/city_of_los_angeles_geometry.json'),
+    'path': os.path.abspath(os.getcwd() + '/regions/migrations/fixtures/city_of_los_angeles_geometry.json'),
     'name': 'city of los angeles',
 }]
 

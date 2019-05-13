@@ -18,7 +18,7 @@ BIN_DIR = os.path.abspath(BASE_DIR + '/../..') + '/bin'
 # DATABASE CONNECTIONS CONFIG
 DB_URL = 'mysql://root@localhost/crymepipelines?serverTimezone=UTC'
 FEEDER_DB_URL = 'mongodb://localhost:27017/crymeclarity'
-CRYMEWEB_DB_URL = 'mysql://root@localhost/crymeweb'
+CRYMEWEB_DB_URL = 'mysql://root@localhost/crymeweb?serverTimezone=UTC'
 
 cp_conn = CrymePipelinesMySqlConn(DB_URL)
 cw_conn = CrymePipelinesMySqlConn(CRYMEWEB_DB_URL)

@@ -153,19 +153,44 @@ class EvalCrymeClassifier(NativeCrymeTask):
             cp_conn.conn.commit()
 
 
-class CleanAndPipeRecentCrimeIncidents(SparkCrymeTask):
+class CleanCrimeIncidents(SparkCrymeTask):
+    output_file = TMP_DIR + '/clean_crime_incidents.parquet'
+
     def run(self):
         raw_crime_incidents = self.load_df_from_crymefeeder("incidents")
         crime_incidents = raw_crime_incidents.withColumn('date_occ', ts_conv(raw_crime_incidents.date_occ))
-        crime_incidents = crime_incidents.filter(crime_incidents.date_occ > datetime.now().date() - timedelta(days=30))
+        crime_incidents = crime_incidents.filter(crime_incidents.date_occ > datetime.now().date() - timedelta(days=365))
         crime_incidents = crime_incidents.filter(crime_incidents.crm_cd.isin(list(safety_rel_crimes.keys())))
-
         crime_incidents = crime_incidents.withColumn('Latitude', crime_incidents.location_1.coordinates[0])
         crime_incidents = crime_incidents.withColumn('Longitude', crime_incidents.location_1.coordinates[1])
         crime_incidents = crime_incidents.select(
             ['_id', 'crm_cd', 'crm_cd_desc', 'date_occ', 'time_occ', 'premis_desc', 'longitude', 'latitude']
         )
-        self.write_to_cw(crime_incidents, 'crime_crimes')
+        crime_incidents.write.parquet(self.output_file)
+
+
+class PipeRecentCrimeIncidents(SparkCrymeTask):
+    input_file = TMP_DIR + '/clean_crime_incidents.parquet'
+
+    def run(self):
+        crime_incidents = self.spark.read.parquet(self.input_file)
+        crime_incidents = crime_incidents.filter(crime_incidents.date_occ > datetime.now().date() - timedelta(days=30))
+        crime_incidents = self.sanitize_df_for_cw_ingestion(crime_incidents)
+
+        self.write_to_cw(crime_incidents, 'crime_crimeincident')
+
+
+class AggregateCrimeVolumes(SparkCrymeTask):
+    input_file = TMP_DIR + '/clean_crime_incidents.parquet'
+
+    def run(self):
+        crime_incidents = self.spark.read.parquet(self.input_file)
+        crime_incidents = crime_incidents.filter(crime_incidents.date_occ > datetime.now().date() - timedelta(days=30))
+
+        by_date = crime_incidents.groupBy('date_occ').agg({'_id': 'count'}).orderBy("date_occ", ascending=True)
+        by_date = self.sanitize_df_for_cw_ingestion(by_date)
+        self.write_to_cw(by_date, 'crime_dailycrimevolume')
+
 
 
 

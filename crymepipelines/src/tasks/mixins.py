@@ -2,20 +2,17 @@ from datetime import datetime, timedelta
 import pyspark.sql.functions as psf
 from pyspark.sql.functions import col
 
+from shared.settings import TMP_DIR
 from .base import SparkCrymeTask
 from .mappings import ts_conv, t_occ_conv, actb_lat, actb_lon, space_dist
 
 
 class SearchForCrimesMixin(SparkCrymeTask):
+    input_file = TMP_DIR + '/clean_crime_incidents.parquet'
+
     def search_for_crimes(self, events_sample):
-        crime_incidents = self.load_df_from_crymefeeder("incidents")
+        crime_incidents = self.spark.read.parquet(self.input_file)
 
-        # clean data
-
-        # convert timestamp strings to datetime
-        crime_incidents = crime_incidents.withColumn('date_occ', ts_conv(crime_incidents.date_occ))
-        # only days after jan 1 2018 / invalid ts strings
-        crime_incidents = crime_incidents.filter(crime_incidents['date_occ'] > datetime.now() - timedelta(days=365))
         # convert time occurred to seconds
         crime_incidents = crime_incidents.withColumn('time_occ_seconds', t_occ_conv(crime_incidents.time_occ))
         crime_incidents = crime_incidents.filter(crime_incidents.time_occ_seconds >= 0)  # remove invalid choices

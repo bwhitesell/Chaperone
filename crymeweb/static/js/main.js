@@ -273,15 +273,6 @@
               data: data1
 
             },
-            {
-              label: 'My Second dataset',
-              backgroundColor: brandProduct,
-              borderColor: 'transparent',
-              pointHoverBackgroundColor: '#fff',
-              borderWidth: 0,
-              data: data2
-
-            }
           ]
         },
         options: {
@@ -1668,3 +1659,73 @@
   }
 
 })(jQuery);
+
+function basicLineChart (x, y, ctx) {
+
+    // var ctx = document.getElementById("recent-rep-chart");
+    if (ctx) {
+      ctx.height = 250;
+      var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: x,
+          datasets: [
+            {
+              label: 'Crimes Per Day',
+              backgroundColor: 'rgba(0,181,233,0.8)',
+              borderColor: 'transparent',
+              pointHoverBackgroundColor: '#fff',
+              borderWidth: 0,
+              data: y
+
+            },
+          ]
+        },
+        options: {
+          maintainAspectRatio: true,
+          legend: {
+            display: false
+          },
+          responsive: true,
+          scales: {
+            xAxes: [{
+              gridLines: {
+                drawOnChartArea: true,
+                color: '#f2f2f2'
+              },
+              ticks: {
+                fontFamily: "Poppins",
+                fontSize: 12
+              }
+            }],
+            yAxes: [{
+              ticks: {
+                beginAtZero: true,
+                maxTicksLimit: 5,
+                stepSize: 100,
+                max: Math.max.apply(null, y),
+                fontFamily: "Poppins",
+                fontSize: 12
+              },
+              gridLines: {
+                display: true,
+                color: '#f2f2f2'
+
+              }
+            }]
+          },
+          elements: {
+            point: {
+              radius: 0,
+              hitRadius: 10,
+              hoverRadius: 4,
+              hoverBorderWidth: 3
+            }
+          }
+
+
+        }
+      });
+    }
+    console.log(Math.max.apply(null, y))
+};

@@ -1,3 +1,5 @@
+from pyspark.sql.functions import monotonically_increasing_id
+
 from shared.settings import DB_URL, FEEDER_DB_URL, CRYMEWEB_DB_URL
 
 
@@ -34,6 +36,13 @@ class SparkCrymeTask(BaseCrymeTask):
             "uri",
             self.feeder_db_url + '.' + collection
         ).load()
+
+    @staticmethod
+    def sanitize_df_for_cw_ingestion(df):
+        df = df.withColumn("id", monotonically_increasing_id())
+        df = df.withColumn("date_occ", df.date_occ.cast("string"))
+        df = df.withColumnRenamed("_id", "row_id")
+        return df
 
 
 class NativeCrymeTask(BaseCrymeTask):

@@ -24,3 +24,16 @@ class DailyCrimeVolume(models.Model):
     volume = models.IntegerField()
 
     objects = DailyCrimeVolumeManager()
+
+
+class CrimePremisesVolumeManager(models.Manager):
+    def get_chart_data(self):
+        qs = self.all().order_by('-volume').values_list('premis_desc', 'volume')
+        return [ins[0] for ins in qs], [ins[1] for ins in qs]
+
+
+class CrimesPremisesVolume(models.Model):
+    premis_desc = models.TextField()
+    volume = models.IntegerField()
+
+    objects = CrimePremisesVolumeManager()

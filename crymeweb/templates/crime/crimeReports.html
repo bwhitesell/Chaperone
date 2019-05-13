@@ -47,25 +47,31 @@
                         </div>
                     </div>
                 </div>
-                <div class="pagination">
-                    <span class="step-links">
-                        {% if reports.has_previous %}
-                            <a href="">&laquo; first</a>
-                            <a href="{{ reports.previous_page_number }}">previous</a>
-                        {% endif %}
+                <div class="row">
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if reports.has_previous %}
+                                <a href="">&laquo; first</a>
+                                <a href="{{ reports.previous_page_number }}">previous</a>
+                            {% endif %}
 
-                        <span class="current">
-                            Page {{ reports.number }} of {{ reports.paginator.num_pages }}.
+                            <span class="current">
+                                Page {{ reports.number }} of {{ reports.paginator.num_pages }}.
+                            </span>
+
+                            {% if reports.has_next %}
+                                <a href="{{ reports.next_page_number }}">next</a>
+                                <a href="{{ reports.paginator.num_pages }}">last &raquo;</a>
+                            {% endif %}
                         </span>
-
-                        {% if reports.has_next %}
-                            <a href="{{ reports.next_page_number }}">next</a>
-                            <a href="{{ reports.paginator.num_pages }}">last &raquo;</a>
-                        {% endif %}
-                    </span>
+                    </div>
                 </div>
-                {% include "crime/recentCrimeVolumeChart.html" %}
+                <div class="row">
+                    {% include "crime/recentCrimeVolumeChart.html" %}
+                    {% include "crime/crimeByPremisesChart.html" %}
+                </div>
             </div>
+
             <div class="row">
                 <div class="col-md-12">
                     <div class="copyright">

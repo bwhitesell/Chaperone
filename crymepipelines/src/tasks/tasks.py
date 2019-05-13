@@ -2,6 +2,7 @@ import csv
 from datetime import datetime, timedelta
 import os
 import pickle as p
+from pyspark.sql.functions import monotonically_increasing_id
 import shutil
 
 from shared.objects.samples import SamplesManager
@@ -164,7 +165,7 @@ class CleanCrimeIncidents(SparkCrymeTask):
         crime_incidents = crime_incidents.withColumn('Latitude', crime_incidents.location_1.coordinates[0])
         crime_incidents = crime_incidents.withColumn('Longitude', crime_incidents.location_1.coordinates[1])
         crime_incidents = crime_incidents.select(
-            ['_id', 'crm_cd', 'crm_cd_desc', 'date_occ', 'time_occ', 'premis_desc', 'longitude', 'latitude']
+            ['id', '_id', 'crm_cd', 'crm_cd_desc', 'date_occ', 'time_occ', 'premis_desc', 'longitude', 'latitude']
         )
         crime_incidents.write.parquet(self.output_file)
 
@@ -175,7 +176,10 @@ class PipeRecentCrimeIncidents(SparkCrymeTask):
     def run(self):
         crime_incidents = self.spark.read.parquet(self.input_file)
         crime_incidents = crime_incidents.filter(crime_incidents.date_occ > datetime.now().date() - timedelta(days=30))
-        crime_incidents = self.sanitize_df_for_cw_ingestion(crime_incidents)
+
+        crime_incidents = crime_incidents.withColumn("id", monotonically_increasing_id())
+        crime_incidents = crime_incidents.withColumn("date_occ_str", crime_incidents.date_occ.cast("string"))
+        crime_incidents = crime_incidents.withColumnRenamed("_id", "row_id")
 
         self.write_to_cw(crime_incidents, 'crime_crimeincident')
 
@@ -188,8 +192,31 @@ class AggregateCrimeVolumes(SparkCrymeTask):
         crime_incidents = crime_incidents.filter(crime_incidents.date_occ > datetime.now().date() - timedelta(days=30))
 
         by_date = crime_incidents.groupBy('date_occ').agg({'_id': 'count'}).orderBy("date_occ", ascending=True)
-        by_date = self.sanitize_df_for_cw_ingestion(by_date)
+
+        by_date = by_date.withColumn("id", monotonically_increasing_id())
+        by_date = by_date.withColumn("date_occ_str", by_date.date_occ.cast("string"))
+        by_date = by_date.withColumnRenamed("count(_id)", "volume")
+        by_date = by_date.select(
+            ['date_occ_str', 'volume', 'id']
+        )
+
         self.write_to_cw(by_date, 'crime_dailycrimevolume')
+
+
+class CrimesByPremises(SparkCrymeTask):
+    input_file = TMP_DIR + '/clean_crime_incidents.parquet'
+
+    def run(self):
+        crime_incidents = self.spark.read.parquet(self.input_file)
+        crime_incidents = crime_incidents.filter(crime_incidents.date_occ > datetime.now().date() - timedelta(days=30))
+
+        by_type = crime_incidents.groupBy('premis_desc').agg({'_id': 'count'}).orderBy("count(_id)", ascending=False)
+        by_type = by_type.withColumn("id", monotonically_increasing_id())
+        by_type = by_type.withColumnRenamed("count(_id)", "volume")
+
+        self.write_to_cw(by_type.limit(10), 'crime_crimespremisesvolume')
+
+
 
 
 

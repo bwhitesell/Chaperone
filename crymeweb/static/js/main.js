@@ -1662,9 +1662,8 @@
 
 function basicLineChart (x, y, ctx) {
 
-    // var ctx = document.getElementById("recent-rep-chart");
     if (ctx) {
-      ctx.height = 250;
+      ctx.height = 390;
       var myChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -1703,7 +1702,6 @@ function basicLineChart (x, y, ctx) {
                 beginAtZero: true,
                 maxTicksLimit: 5,
                 stepSize: 100,
-                max: Math.max.apply(null, y),
                 fontFamily: "Poppins",
                 fontSize: 12
               },
@@ -1728,4 +1726,51 @@ function basicLineChart (x, y, ctx) {
       });
     }
     console.log(Math.max.apply(null, y))
+};
+
+function basicBarChart (x, y, ctx) {
+
+    if (ctx) {
+      ctx.height = 350;
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: x,
+          datasets: [
+            {
+              label: "Crimes by Premises Description",
+              data: y,
+              borderColor: 'rgba(0,181,233,0.8)',
+              borderWidth: "0",
+              backgroundColor: 'rgba(0,181,233,0.8)'
+            }
+          ]
+        },
+        options: {
+          legend: {
+            display: false,
+            position: 'top',
+            labels: {
+              fontFamily: 'Poppins'
+            }
+
+          },
+          scales: {
+            xAxes: [{
+              ticks: {
+                autoSkip: false,
+                fontFamily: "Poppins"
+
+              }
+            }],
+            yAxes: [{
+              ticks: {
+                beginAtZero: true,
+                fontFamily: "Poppins"
+              }
+            }]
+          }
+        }
+      });
+    };
 };

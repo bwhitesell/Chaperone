@@ -1,0 +1,16 @@
+<div class="col-lg-6">
+<div class="au-card recent-report">
+        <div class="au-card-inner">
+            <h3 class="title-2 m-b-40">Crimes by Location Type (Last 30 Days)</h3>
+            <div class="recent-report__chart">
+                <canvas id="crime-by-premises-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var x = {{ premises|safe }}
+    var y = {{ prem_volumes|safe }}
+    basicBarChart(x, y, document.getElementById("crime-by-premises-chart"));
+</script>

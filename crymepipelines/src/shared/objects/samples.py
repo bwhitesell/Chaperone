@@ -39,7 +39,7 @@ class SamplesManager:
         else:
             return resp.date()
 
-    def _add_samples(self, date_arg, n_samples=500):
+    def _add_samples(self, date_arg, n_samples=5000):
         min_lat, max_lat, min_long, max_long = self.gd.get_bounding_box()
         valid_samples = self._generate_location_times(min_lat, max_lat, min_long, max_long, date_arg, n_samples)
         self._save_samples(valid_samples)

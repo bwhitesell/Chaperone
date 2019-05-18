@@ -28,22 +28,59 @@ class GenerateLocationTimeSamples(NativeCrymeTask):
 
 
 class EngineerFeaturesLocationTimeSamples(SparkCrymeTask, SearchForCrimesMixin):
-    input_file = TMP_DIR + 'features_crime_incidents.parquet'
-    output_file = TMP_DIR + 'complete_dataset.parquet'
+    input_file = TMP_DIR + '/features_crime_incidents.parquet'
+    output_file = TMP_DIR + '/complete_dataset.csv'
 
     def run(self):
         crime_incidents = self.spark.read.parquet(self.input_file)
         loc_time_samples = self.load_df_from_cp('location_time_samples')
-        # assign bounding boxes
         loc_time_samples = loc_time_samples.withColumn('lat_bb', actb_lat(loc_time_samples.latitude))
         loc_time_samples = loc_time_samples.withColumn('lon_bb', actb_lon(loc_time_samples.longitude))
-        # convert datetime to unix timestamp
         loc_time_samples = loc_time_samples.withColumn('timestamp_unix', unix_timestamp(loc_time_samples.timestamp))
 
-        loc_time_samples_full = self.find_surrounding_crimes(loc_time_samples, crime_incidents)
+        dataset = self.find_surrounding_crimes(loc_time_samples, crime_incidents)
+
+        dataset = dataset.withColumn('time_minutes', ts_to_minutes_in_day_udf(dataset.timestamp))
+        dataset = dataset.withColumn('hour', ts_to_hour_of_day_udf(dataset.timestamp))
+        dataset = dataset.withColumn('day_of_week', ts_to_day_of_week_udf(dataset.timestamp))
+        dataset = dataset.collect()
+
+        with open(self.output_file, 'w') as output:
+            writer = csv.writer(output, delimiter=',',)
+            writer.writerow(
+                ['id', 'latitude', 'longitude', 'timestamp', 'lat_bb', 'lon_bb', 'timestamp_unix', 'n_ab',
+                 'n_b', 'n_t', 'n_btv', 'n_vbbs', 'n_pdt', 'n_ltvc', 'n_sp', 'n_mio', 'n_r', 'time_minutes',
+                 'day_of_week']
+            )  # headers
+            for row in dataset:
+                writer.writerow(self.row_to_list(row))
+
+    @staticmethod
+    def row_to_list(row):
+        return [
+            row.id,
+            row.latitude,
+            row.longitude,
+            row.timestamp,
+            row.lat_bb,
+            row.lon_bb,
+            row.timestamp_unix,
+            row.n_ab,
+            row.n_b,
+            row.n_t,
+            row.n_btv,
+            row.n_vbbs,
+            row.n_pdt,
+            row.n_ltvc,
+            row.n_sp,
+            row.n_mio,
+            row.n_r,
+            row.time_minutes,
+            row.day_of_week,
+        ]
 
 
-class BuildRecentDataset(SearchForCrimesMixin):
+class BuildRecentDataset(SparkCrymeTask, SearchForCrimesMixin):
     output_file = TMP_DIR + '/features.parquet'
 
     def run(self):
@@ -56,68 +93,14 @@ class BuildRecentDataset(SearchForCrimesMixin):
         events_sample = events_sample.filter(events_sample.timestamp < update_date + timedelta(days=1))
         events_sample = events_sample.filter(events_sample.timestamp > update_date)
         features_ds = self.search_for_crimes(events_sample)
-        features_ds.write.parquet(TMP_DIR + '/features.parquet')
+        features_ds.write.parquet(self.output_file)
 
 
-class CleanDataset(SparkCrymeTask):
-    input_file = TMP_DIR + '/features.parquet'
-    output_file = TMP_DIR + '/features_clean.parquet'
-
-    def run(self):
-        df = self.spark.read.parquet(self.input_file)
-        df = df.fillna(0, subset=['count'])  # fill none values with 0.
-        df.write.parquet(self.output_file)
-        shutil.rmtree(self.input_file)
-
-
-class EngineerFeatures(SparkCrymeTask):
-    input_file = TMP_DIR + '/features_clean.parquet'
-    output_file = TMP_DIR + '/final_dataset.csv'
+class TrainCrymeClassifiers(NativeCrymeTask):
+    input_file = TMP_DIR + '/complete_dataset.csv'
+    output_file = BIN_DIR + '/cryme_classifier_' + str(datetime.now().date())
 
     def run(self):
-        df = self.spark.read.parquet(self.input_file)
-        df = df.withColumn('crime_occ', crime_occ_udf(df['count']))
-        df = df.withColumn('time_minutes', ts_to_minutes_in_day_udf(df.timestamp))
-        df = df.withColumn('hour', ts_to_hour_of_day_udf(df.timestamp))
-        df = df.withColumn('day_of_week', ts_to_day_of_week_udf(df.timestamp))
-        df = df.collect()
-        with open(self.output_file, 'w') as output:
-            writer = csv.writer(output, delimiter=',',)
-            writer.writerow(
-                ['id', 'latitude', 'longitude', 'timestamp', 'lat_bb', 'lon_bb',
-                 'timestamp_unix', 'count', 'crime_occ', 'time_minutes', 'day_of_week']
-            )  # headers
-            for row in df:
-                writer.writerow(self.row_to_list(row))
-
-        shutil.rmtree(self.input_file)
-
-    @staticmethod
-    def row_to_list(row):
-        return [
-            row.id,
-            row.latitude,
-            row.longitude,
-            row.timestamp,
-            row.lat_bb,
-            row.lon_bb,
-            row.timestamp_unix,
-            row.count,
-            row.crime_occ,
-            row.time_minutes,
-            row.day_of_week,
-        ]
-
-
-class TrainCrymeClassifier(NativeCrymeTask):
-    input_file = TMP_DIR + '/final_dataset.csv'
-    output_file = BIN_DIR + '/cryme_classifier_' + str(datetime.now().date()) + '.p'
-
-    def run(self):
-
-        features = ['longitude', 'latitude', 'time_minutes', 'day_of_week']
-        target = 'crime_occ'
-
         data = self._local_mod_access['pandas'].read_csv(self.input_file)
         ts_end = cf_conn.get_recency_data() - CF_TRUST_DELAY - timedelta(days=15)
         ts_start = str(ts_end - timedelta(days=300))
@@ -125,19 +108,23 @@ class TrainCrymeClassifier(NativeCrymeTask):
 
         train_ds = data[(data.timestamp > ts_start) & (data.timestamp < ts_end)]
         test_ds = data[(data.timestamp > ts_end)]
-        rfc = self._local_mod_access['RandomForestClassifier'](max_depth=10, n_estimators=500, n_jobs=-1)
-        rfc.fit(train_ds[features], train_ds[target])
-        y_est = rfc.predict_proba(test_ds[features])
-        ll = self._local_mod_access['log_loss'](test_ds[target], y_est)
 
-        p.dump(rfc, open(self.output_file, 'wb'))
-        os.remove(self.input_file)
+        features = ['longitude', 'latitude', 'time_minutes', 'day_of_week']
+        for target in ['n_ab', 'n_bt', 'n_btv', 'n_vbbs', 'n_pdt', 'n_ltvc', 'n_sp', 'n_mio', 'n_r']:
 
-        cursor = cp_conn.cursor()
-        cursor.execute(
-            f'CALL AddNewModel({round(ll, 2)}, {train_ds.shape[0]}, {test_ds.shape[0]}, "{self.output_file}")'
-        )
-        cp_conn.conn.commit()
+            rfc = self._local_mod_access['RandomForestClassifier'](max_depth=10, n_estimators=500, n_jobs=-1)
+            rfc.fit(train_ds[features], train_ds[target])
+            y_est = rfc.predict_proba(test_ds[features])
+            ll = self._local_mod_access['log_loss'](test_ds[target], y_est)
+
+            p.dump(rfc, open(self.output_file + '_' + target+'.p', 'wb'))
+
+            cursor = cp_conn.cursor()
+            cursor.execute(
+                f'CALL AddNewModel({round(ll, 2)}, {train_ds.shape[0]}, {test_ds.shape[0]}, "{self.output_file}")'
+            )
+            cp_conn.conn.commit()
+            print(f'Classifier for {target} trained and exported.')
 
 
 class EvalCrymeClassifier(NativeCrymeTask):
@@ -170,8 +157,8 @@ class CleanCrimeIncidents(SparkCrymeTask):
         crime_incidents = raw_crime_incidents.withColumn('date_occ', ts_conv(raw_crime_incidents.date_occ))
         crime_incidents = crime_incidents.filter(crime_incidents.date_occ > datetime.now().date() - timedelta(days=365))
         crime_incidents = crime_incidents.filter(crime_incidents.crm_cd.isin(list(safety_rel_crimes.keys())))
-        crime_incidents = crime_incidents.withColumn('lon', crime_incidents.location_1.coordinates[0])
-        crime_incidents = crime_incidents.withColumn('lat', crime_incidents.location_1.coordinates[1])
+        crime_incidents = crime_incidents.withColumn('lon', crime_incidents.location_1.coordinates[1])
+        crime_incidents = crime_incidents.withColumn('lat', crime_incidents.location_1.coordinates[0])
         crime_incidents = crime_incidents.select(
             ['_id', 'crm_cd', 'crm_cd_desc', 'date_occ', 'time_occ', 'premis_desc', 'lon', 'lat']
         )

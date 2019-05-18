@@ -8,7 +8,7 @@ import mpu
 # Define native python mappings here
 def assign_coordinate_to_lat_box(latitude):
     try:
-        lat_box = abs(int(latitude / (1 * .008726950000000073)))
+        lat_box = abs(int(latitude / (1 * 0.004363475000000037)))
         return lat_box
     except ValueError:
         return 0

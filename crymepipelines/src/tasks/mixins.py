@@ -7,38 +7,10 @@ from .base import SparkCrymeTask
 from .mappings import ts_conv, t_occ_conv, actb_lat, actb_lon, space_dist
 
 
-class SearchForCrimesMixin(SparkCrymeTask):
+class SearchForCrimesMixin:
     input_file = TMP_DIR + '/clean_crime_incidents.parquet'
 
-    def search_for_crimes(self, events_sample):
-        crime_incidents = self.spark.read.parquet(self.input_file)
-
-        # convert time occurred to seconds
-        crime_incidents = crime_incidents.withColumn('time_occ_seconds', t_occ_conv(crime_incidents.time_occ))
-        crime_incidents = crime_incidents.filter(crime_incidents.time_occ_seconds >= 0)  # remove invalid choices
-        # convert datetime to unix timestamp
-        crime_incidents = crime_incidents.withColumn('date_occ_unix', psf.unix_timestamp(crime_incidents.date_occ))
-        # assign coordinates to bounding box
-        crime_incidents = crime_incidents.withColumn('lat_bb_c', actb_lat(crime_incidents.location_1.coordinates[0]))
-        # assign coordinates to bounding box
-        crime_incidents = crime_incidents.withColumn('lon_bb_c', actb_lon(crime_incidents.location_1.coordinates[1]))
-        # engineer timestamp in unix feature
-        crime_incidents = crime_incidents.withColumn(
-            'ts_occ_unix',
-            crime_incidents.date_occ_unix + crime_incidents.time_occ_seconds
-        )
-
-        # engineer features
-        events_sample = events_sample.withColumn('lat_bb',
-                                                 actb_lat(events_sample.latitude))  # assign coor to bounding box
-        events_sample = events_sample.withColumn('lon_bb',
-                                                 actb_lon(events_sample.longitude))  # assign coor to bounding box
-        # convert datetime to unix timestamp
-        events_sample = events_sample.withColumn(
-            'timestamp_unix',
-            psf.unix_timestamp(events_sample.timestamp)
-        )
-
+    def find_surrounding_crimes(self, events_sample, crime_incidents):
         #  begin grid search and merge
         results = None
         for i in range(-1, 2):
@@ -61,11 +33,11 @@ class SearchForCrimesMixin(SparkCrymeTask):
                 results_subsample = results_subsample.withColumn('distance', space_dist(
                     results_subsample.longitude,
                     results_subsample.latitude,
-                    results_subsample.location_1.coordinates[1],
-                    results_subsample.location_1.coordinates[0],
+                    results_subsample.lon,
+                    results_subsample.lat,
                 ))
 
-                results_subsample = results_subsample.filter(results_subsample.distance < .5)
+                results_subsample = results_subsample.filter(results_subsample.distance < .25)
                 results = results.union(results_subsample) if results else results_subsample
 
         # All local crime incidents found, count incidents per event and merge back with events sample

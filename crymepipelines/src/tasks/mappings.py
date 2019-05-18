@@ -1,14 +1,15 @@
 import datetime
-from pyspark.sql.types import ArrayType, StructType, IntegerType, StructField, StringType, FloatType, TimestampType, \
-    DecimalType
 from pyspark.sql.functions import udf
+from pyspark.sql.types import IntegerType, StringType, FloatType, TimestampType
 import mpu
+
+from .constants import crime_group_mapping
 
 
 # Define native python mappings here
 def assign_coordinate_to_lat_box(latitude):
     try:
-        lat_box = abs(int(latitude / (1 * .008726950000000073)))
+        lat_box = abs(int(latitude / (1 * 0.004363475000000037)))
         return lat_box
     except ValueError:
         return 0
@@ -62,3 +63,4 @@ crime_occ_udf = udf(crime_occ, IntegerType())
 ts_to_minutes_in_day_udf = udf(ts_to_minutes_in_day, IntegerType())
 ts_to_hour_of_day_udf = udf(ts_to_hour_of_day, IntegerType())
 ts_to_day_of_week_udf = udf(ts_to_day_of_week, IntegerType())
+crime_group_assignment_udf = udf(lambda x: crime_group_mapping.get(int(x), 'Other'), StringType())

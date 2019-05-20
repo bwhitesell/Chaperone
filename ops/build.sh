@@ -38,8 +38,8 @@ echo 'export PATH=$PATH:$SPARK_HOME/bin' | sudo tee -a $HOME/.bashrc
 cp $HOME/spark/conf/spark-defaults.conf.template $HOME/spark/conf/spark-defaults.conf
 echo 'spark.io.compression.codec org.apache.spark.io.SnappyCompressionCodec' | sudo tee -a /$HOME/spark/conf/spark-defaults.conf
 
-# Give Spark 2GB of RAM, use Python3
-echo "spark.driver.memory 2g" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
+# Give Spark 4GB of RAM, use Python3
+echo "spark.driver.memory 4g" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
 echo "spark.executor.cores 2" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
 echo "PYSPARK_PYTHON=python3" | sudo tee -a $SPARK_HOME/conf/spark-env.sh
 echo "PYSPARK_DRIVER_PYTHON=python3" | sudo tee -a $SPARK_HOME/conf/spark-env.sh

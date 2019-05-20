@@ -89,3 +89,21 @@ t7.set_upstream(t6)
 t8.set_upstream(t7)
 t9.set_upstream(t8)
 t10.set_upstream(t9)
+
+
+# PIPE RAW EVENTS DAG #
+pipe_events_dag = DAG('pipe_events', default_args=default_args,
+                      schedule_interval='* 12 * * *', catchup=False)
+
+t11 = BashOperator(
+    task_id='clean_crime_incidents',
+    bash_command=cli_args['spark-submit'] + 'run.py --task CleanCrimeIncidents',
+    dag=pipe_events_dag)
+
+t12 = BashOperator(
+    task_id='pipe_recent_crime_incidents',
+    bash_command=cli_args['spark-submit'] + 'run.py --task PipeRecentCrimeIncidents',
+    dag=pipe_events_dag)
+
+t11.set_upstream(t12)
+

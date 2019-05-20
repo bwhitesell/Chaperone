@@ -1,0 +1,18 @@
+{% block content %}
+<div class="col-lg-6">
+    <div class="au-card recent-report">
+        <div class="au-card-inner">
+            <h3 class="title-2">Crimes Per Day</h3>
+            <div class="recent-report__chart">
+                <canvas id="recent-crime-volume-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var x = {{ dates|safe }}
+    var y = {{ date_volumes|safe }}
+    basicLineChart(x, y, document.getElementById("recent-crime-volume-chart"));
+</script>
+{% endblock %}

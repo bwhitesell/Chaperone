@@ -9,8 +9,8 @@ class CrimeIncident(models.Model):
     date_occ_str = models.CharField(max_length=70)
     time_occ = models.IntegerField()
     premis_desc = models.TextField()
-    longitude = models.FloatField()
-    latitude = models.FloatField()
+    lon = models.FloatField()
+    lat = models.FloatField()
 
 
 class DailyCrimeVolumeManager(models.Manager):

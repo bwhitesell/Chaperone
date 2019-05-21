@@ -51,10 +51,10 @@ class EngineerFeaturesDailyLocationTimeSamples(SparkCrymeTask, SearchForCrimesMi
             raise ValueError('Invalid Update Date Specified.')
 
         crime_incidents = self.spark.read.parquet(self.input_file)
-        crime_incidents = crime_incidents.filter(crime_incidents.date_occ < update_date)
-        crime_incidents = crime_incidents.filter(crime_incidents.date_occ > update_date - timedelta(days=2))
 
         loc_time_samples = self.load_df_from_cp('location_time_samples')
+        loc_time_samples = loc_time_samples.filter(loc_time_samples.timestamp < update_date + timedelta(days=1))
+        loc_time_samples = loc_time_samples.filter(loc_time_samples.timestamp > update_date)
         loc_time_samples = loc_time_samples.withColumn('lat_bb', actb_lat(loc_time_samples.latitude))
         loc_time_samples = loc_time_samples.withColumn('lon_bb', actb_lon(loc_time_samples.longitude))
         loc_time_samples = loc_time_samples.withColumn('timestamp_unix', unix_timestamp(loc_time_samples.timestamp))
@@ -63,6 +63,7 @@ class EngineerFeaturesDailyLocationTimeSamples(SparkCrymeTask, SearchForCrimesMi
         dataset = dataset.withColumn('time_minutes', ts_to_minutes_in_day_udf(dataset.timestamp))
         dataset = dataset.withColumn('hour', ts_to_hour_of_day_udf(dataset.timestamp))
         dataset = dataset.withColumn('day_of_week', ts_to_day_of_week_udf(dataset.timestamp))
+        print(dataset.count())
         dataset = dataset.collect()
 
         with open(self.output_file, 'w') as output:

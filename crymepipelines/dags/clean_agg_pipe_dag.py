@@ -46,16 +46,11 @@ t3 = BashOperator(
     dag=pipe_events_dag)
 
 t4 = BashOperator(
-    task_id='pipe_recent_crime_incidents',
-    bash_command=cli_args['spark-submit'] + 'run.py --task PipeRecentCrimeIncidents',
-    dag=pipe_events_dag)
-
-t5 = BashOperator(
     task_id='aggregate_crime_volumes',
     bash_command=cli_args['spark-submit'] + 'run.py --task AggregateCrimeVolumes',
     dag=pipe_events_dag)
 
-t6 = BashOperator(
+t5 = BashOperator(
     task_id='aggregate_crime_by_premises',
     bash_command=cli_args['spark-submit'] + 'run.py --task AggregateCrimesByPremises',
     dag=pipe_events_dag)
@@ -63,7 +58,6 @@ t6 = BashOperator(
 t1.set_upstream(t0)
 t2.set_upstream(t1)
 t3.set_upstream(t2)
-t4.set_upstream(t2)
-t5.set_upstream(t2)
-t6.set_upstream(t2)
+t4.set_upstream(t3)
+t5.set_upstream(t3)
 

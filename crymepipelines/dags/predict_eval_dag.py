@@ -23,34 +23,29 @@ cli_args = {
 
 # TRAIN CRYME CLASSIFIER DAG #
 train_cryme_classifier_dag = DAG('train_cryme_classifier', default_args=default_args,
-                                 schedule_interval='* * 5 * *', catchup=False)
+                                 schedule_interval=None, catchup=False)
 t1 = BashOperator(
     task_id='clean_crime_incidents',
     bash_command=cli_args['spark-submit'] + 'run.py --task CleanCrimeIncidents',
     dag=train_cryme_classifier_dag)
 
 t2 = BashOperator(
-    task_id='pipe_recent_crime_incidents',
-    bash_command=cli_args['spark-submit'] + 'run.py --task PipeRecentCrimeIncidents',
-    dag=train_cryme_classifier_dag)
-
-t3 = BashOperator(
     task_id='add_features_to_crime_incidents',
     bash_command=cli_args['spark-submit'] + 'run.py --task AddFeaturesToCrimeIncidents',
     dag=train_cryme_classifier_dag)
 
 
-t4 = BashOperator(
+t3 = BashOperator(
     task_id='generate_location_time_samples',
     bash_command=cli_args['local_python_exec'] + 'run.py --task GenerateLocationTimeSamples',
     dag=train_cryme_classifier_dag)
 
-t5 = BashOperator(
+t4 = BashOperator(
     task_id='engineer_features_location_time_samples',
     bash_command=cli_args['spark-submit'] + 'run.py --task EngineerFeaturesLocationTimeSamples',
     dag=train_cryme_classifier_dag)
 
-t6 = BashOperator(
+t5 = BashOperator(
     task_id='train_cryme_classifiers',
     bash_command=cli_args['spark-submit'] + 'run.py --task TrainCrymeClassifiers',
     dag=train_cryme_classifier_dag)
@@ -59,7 +54,6 @@ t2.set_upstream(t1)
 t3.set_upstream(t2)
 t4.set_upstream(t3)
 t5.set_upstream(t4)
-t6.set_upstream(t5)
 
 
 # EVAL CRYME CLASSIFIER DAG #
@@ -70,27 +64,23 @@ t7 = BashOperator(
     bash_command=cli_args['spark-submit'] + 'run.py --task CleanCrimeIncidents',
     dag=eval_cryme_classifier_dag)
 
-t8 = BashOperator(
-    task_id='pipe_recent_crime_incidents',
-    bash_command=cli_args['spark-submit'] + 'run.py --task PipeRecentCrimeIncidents',
-    dag=eval_cryme_classifier_dag)
 
-t9 = BashOperator(
+t8 = BashOperator(
     task_id='add_features_to_crime_incidents',
     bash_command=cli_args['spark-submit'] + 'run.py --task AddFeaturesToCrimeIncidents',
     dag=eval_cryme_classifier_dag)
 
-t10 = BashOperator(
+t9 = BashOperator(
     task_id='generate_location_time_samples',
     bash_command=cli_args['local_python_exec'] + 'run.py --task GenerateLocationTimeSamples',
     dag=eval_cryme_classifier_dag)
 
-t11 = BashOperator(
+t10 = BashOperator(
     task_id='engineer_features_daily_location_time_samples',
     bash_command=cli_args['spark-submit'] + 'run.py --task EngineerFeaturesDailyLocationTimeSamples',
     dag=eval_cryme_classifier_dag)
 
-t12 = BashOperator(
+t11 = BashOperator(
     task_id='eval_cryme_classifiers',
     bash_command=cli_args['spark-submit'] + 'run.py --task EvalCrymeClassifiers',
     dag=eval_cryme_classifier_dag)
@@ -100,4 +90,3 @@ t8.set_upstream(t7)
 t9.set_upstream(t8)
 t10.set_upstream(t9)
 t11.set_upstream(t10)
-t12.set_upstream(t11)

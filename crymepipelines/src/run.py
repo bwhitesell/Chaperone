@@ -34,7 +34,7 @@ def import_rel_modules():
 
 if __name__ == "__main__":
     import_rel_modules()
-    from tasks import tasks as tasks
+    import tasks
     parser = argparse.ArgumentParser(description='Run a CrymeTask')
     parser.add_argument('--task', type=str, required=True, dest='task_name', help="The name of the CrymeTask class")
     args = parser.parse_args()

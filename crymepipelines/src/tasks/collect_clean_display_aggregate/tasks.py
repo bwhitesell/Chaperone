@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 from pyspark.sql.functions import monotonically_increasing_id, unix_timestamp
+from pyspark.sql.utils import AnalysisException
+import shutil
 
 from shared.objects.samples import SamplesManager
 from shared.settings import CF_TRUST_DELAY, START_DATE, cf_conn, cp_conn, TMP_DIR, BIN_DIR
@@ -34,7 +36,11 @@ class CleanCrimeIncidents(SparkCrymeTask):
         crime_incidents = crime_incidents.select(
             ['_id', 'crm_cd', 'crm_cd_desc', 'date_occ', 'time_occ', 'premis_desc', 'lon', 'lat']
         )
-        crime_incidents.write.parquet(self.output_file)
+        try:
+            crime_incidents.write.parquet(self.output_file)
+        except AnalysisException:
+            shutil.rmtree(self.output_file)
+            crime_incidents.write.parquet(self.output_file)
 
 
 class AddFeaturesToCrimeIncidents(SparkCrymeTask):
@@ -51,7 +57,11 @@ class AddFeaturesToCrimeIncidents(SparkCrymeTask):
         crime_incidents = crime_incidents.withColumn(
             'ts_occ_unix', crime_incidents.date_occ_unix + crime_incidents.time_occ_seconds
         )
-        crime_incidents.write.parquet(self.output_file)
+        try:
+            crime_incidents.write.parquet(self.output_file)
+        except AnalysisException:
+            shutil.rmtree(self.output_file)
+            crime_incidents.write.parquet(self.output_file)
 
 
 class PipeRecentCrimeIncidents(SparkCrymeTask):

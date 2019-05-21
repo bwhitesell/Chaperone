@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS geometries (
 
 CREATE TABLE IF NOT EXISTS cryme_classifiers (
   id INT AUTO_INCREMENT,
+  target VARCHAR(255) NOT NULL,
   log_loss FLOAT(53) NOT NULL,
   n_samples_train INT NOT NULL,
   n_samples_test INT NOT NULL,
@@ -36,11 +37,11 @@ CREATE TABLE IF NOT EXISTS model_performance (
 ) ENGINE=INNODB;
 
 DELIMITER //
-CREATE PROCEDURE AddNewModel(log_loss_val FLOAT(53), n_samples_train_val INT, n_samples_test_val INT, saved_to_val VARCHAR(255))
+CREATE PROCEDURE AddNewModel(target_val VARCHAR(255), log_loss_val FLOAT(53), n_samples_train_val INT, n_samples_test_val INT, saved_to_val VARCHAR(255))
   BEGIN
   INSERT INTO cryme_classifiers
-    (log_loss, n_samples_train, n_samples_test, model_generated_on, saved_to)
-    VALUES (log_loss_val, n_samples_train_val, n_samples_test_val, CURRENT_TIMESTAMP(), saved_to_val);
+    (target, log_loss, n_samples_train, n_samples_test, model_generated_on, saved_to)
+    VALUES (target_val, log_loss_val, n_samples_train_val, n_samples_test_val, CURRENT_TIMESTAMP(), saved_to_val);
  END //
 DELIMITER ;
 

@@ -64,3 +64,28 @@ ts_to_minutes_in_day_udf = udf(ts_to_minutes_in_day, IntegerType())
 ts_to_hour_of_day_udf = udf(ts_to_hour_of_day, IntegerType())
 ts_to_day_of_week_udf = udf(ts_to_day_of_week, IntegerType())
 crime_group_assignment_udf = udf(lambda x: crime_group_mapping.get(int(x), 'Other'), StringType())
+
+
+# Misc. Utils
+def row_to_list(row):
+    return [
+        row.id,
+        row.latitude,
+        row.longitude,
+        row.timestamp,
+        row.lat_bb,
+        row.lon_bb,
+        row.timestamp_unix,
+        row.n_ab,
+        row.n_b,
+        row.n_t,
+        row.n_btv,
+        row.n_vbbs,
+        row.n_pdt,
+        row.n_ltvc,
+        row.n_sp,
+        row.n_mio,
+        row.n_r,
+        row.time_minutes,
+        row.day_of_week,
+    ]

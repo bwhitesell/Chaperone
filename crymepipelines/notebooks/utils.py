@@ -3,6 +3,11 @@ from pyspark.sql.types import ArrayType, StructType, IntegerType, StructField, S
     DecimalType
 from pyspark.sql.functions import udf
 import mpu
+import numpy as np
+import os
+import pandas as pd
+import folium
+import branca
 
 
 # Define native python mappings here
@@ -138,7 +143,77 @@ safety_rel_crimes = {
     
     
     
+def build_risk_map(rfc, time_of_day):
+    n = 100
+    start_lon = 34.300779
+    end_lon = 33.749713
+    start_lat = -118.155360
+    end_lat = -118.666218
+    delta_lon = (end_lon - start_lon) / n
+    delta_lat = (end_lat - start_lat) / n
+
+    # build geometry
+    features_ = []
+    for row in range(0, n):
+        for col in range(0, n):
+            top_lft_lon = start_lon + row * delta_lon
+            top_lft_lat = start_lat + col * delta_lat
+            feat_dict = {
+                "type":"Feature",
+                "id":str(top_lft_lon + delta_lon/2) + '_' + str(top_lft_lat + delta_lat/2),
+                "properties": {"name": str(row) + '_' + str(col)}
+            }
+
+            coordinates = [[
+                [top_lft_lat, top_lft_lon],
+                [top_lft_lat + delta_lat, top_lft_lon],
+                [top_lft_lat + delta_lat, top_lft_lon + delta_lon],
+                [top_lft_lat, top_lft_lon + delta_lon],
+            ]]
+
+            feat_dict["geometry"] = {
+                "type":"Polygon",
+                "coordinates": coordinates
+            }
+            features_.append(feat_dict)
+
+
+    la_grid_geo = {
+        "type":"FeatureCollection",
+        "features": features_,
+    }
     
+    # assign geometry values
+    point_ids = [z['id'] for z in la_grid_geo['features']]
+    points = [[float(i) for i in j.split('_')] for j in point_ids]
+    points = [i + [time_of_day] for i in points]
+    points = np.array(points)
+    c = rfc.predict_proba(points)[:,1]
+    crime_risk = pd.DataFrame({'id': point_ids, 'risk': rfc.predict_proba(points)[:,1]})
+    cd = crime_risk.set_index('id').to_dict('index')
+    
+    # Initialize the map:
+    m = folium.Map(location=[34.074904, -118.376525], zoom_start=16)
+    colorscale = branca.colormap.linear.RdPu_09.scale(0, rfc.predict_proba(points)[:,1].max())
+
+    # Add the color for the chloropleth:
+
+    folium.GeoJson(
+        la_grid_geo,
+        name='crime_risk',
+        style_function=lambda feature: {
+            'stroke': False,
+            'fillOpacity' : 0.4,
+            'smoothFactor':0,
+            'color': colorscale(cd[feature['id']]['risk']),
+            'dashArray': '1000, 100',
+            'legend_name': 'Theft Risk (%)'
+        }
+    ).add_to(m)
+    folium.LayerControl().add_to(m)
+    return m
+
+
     
     
     

@@ -107,7 +107,9 @@ echo "AIRFLOW_CONFIG=$AIRFLOW_HOME/airflow.cfg" | sudo tee -a /etc/sysconfig/air
 echo "PATH=$PATH" | sudo tee -a /etc/sysconfig/airflow
 
 mkdir $AIRFLOW_HOME/dags
-ln -s $HOME/.envs/cc/CrymeClarity/crymepipelines/cp_dags.py $AIRFLOW_HOME/dags
+ln -s $HOME/.envs/cc/CrymeClarity/crymepipelines/dags/clean_agg_pipe_dag.py $AIRFLOW_HOME/dags
+ln -s $HOME/.envs/cc/CrymeClarity/crymepipelines/dags/predict_eval_dag.py $AIRFLOW_HOME/dags
+
 
 cd $AIRFLOW_HOME
 airflow initdb

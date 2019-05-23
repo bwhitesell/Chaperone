@@ -1,6 +1,5 @@
 from pyspark.sql.functions import udf
 
-from shared.settings import TMP_DIR
 from .mappings import space_dist
 
 
@@ -20,7 +19,7 @@ class SearchForCrimesMixin:
                 )
 
                 results_subsample = results_subsample.filter(
-                    results_subsample.ts_occ_unix - results_subsample.timestamp_unix < 3600 * 2
+                    results_subsample.ts_occ_unix - results_subsample.timestamp_unix < 3600 * 4
                 )
                 results_subsample = results_subsample.filter(
                     results_subsample.ts_occ_unix - results_subsample.timestamp_unix > 0
@@ -33,7 +32,7 @@ class SearchForCrimesMixin:
                     results_subsample.lat,
                 ))
 
-                results_subsample = results_subsample.filter(results_subsample.distance < .25)
+                results_subsample = results_subsample.filter(results_subsample.distance < .175)
                 results = results.union(results_subsample) if results else results_subsample
 
         # All local crime incidents found, count incidents per event and merge back with events sample

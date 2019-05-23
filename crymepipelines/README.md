@@ -1,12 +1,12 @@
 # CrymePipelines
 #### Summary
 🚓CrymePipelines is the analytics engine powering CrymeClarity. At its core,
-it performs OLAP on the data provided by crymefeeder and persists results for use
-by crymeweb.
+it performs OLAP on the data provided by crymefeeder and persists results to a 
+database for use by crymeweb.
 
 The functional object in CrymePipelines is a `CrymeTask`. CrymeTasks are defined in the
  `src/tasks.py` file and scheduled via an airflow DAG. CrymeTasks are built by defining a
- class in the `src/tasks.py` file. If the task will utilize pyspark functionality, then it must 
+ class in the `src/tasks` directory. If the task will utilize pyspark functionality, then it must 
  inherit from `tasks.base.BaseCrymeTask` (as well as any mixins). Each class should have a single 
  `run` method that is run on execution of the task.
  
@@ -28,3 +28,8 @@ Once this file has been edited with the appropriate strings, the app can be buil
 $ pip install -r requirements/native.txt
 $ make CrymePipelines
 ```
+
+#### Scheduling & Airflow
+CrymePipelines operates through a series of scheduled pipelines defined and managed 
+via airflow. These pipelines are defined in `dags` and symlinked to `$AIRFLOW_HOME` in
+the build scripts.

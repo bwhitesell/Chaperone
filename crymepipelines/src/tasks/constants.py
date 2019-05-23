@@ -162,3 +162,77 @@ safety_rel_crimes = {
     485: 'BIKE - ATTEMPTED STOLEN',
     470: 'TILL TAP - GRAND THEFT ($950.01 & OVER)',
 }
+
+
+cc_hyperparams = {
+    'n_t': {
+        'max_depth': 2,
+        'objective': 'binary',
+        'boosting_type': 'gbdt',
+        'learning_rate': 0.778,
+        'num_leaves': 80
+    },
+    'n_b': {
+        'max_depth': 2,
+        "objective": "binary",
+        "boosting_type": "gbdt",
+        "learning_rate": .445,
+        "num_leaves": 10,
+    },
+    'n_ab': {
+        'max_depth': 2,
+        "objective": "binary",
+        "boosting_type": "gbdt",
+        "learning_rate": 1.0,
+        "num_leaves": 30,
+    },
+    'n_ltvc': {
+        'max_depth': 2,
+        "objective": "binary",
+        "boosting_type": "gbdt",
+        "learning_rate": 0.445,
+        "num_leaves": 10,
+    },
+    'n_sp': {
+        'max_depth': 2,
+        "objective": "binary",
+        "boosting_type": "gbdt",
+        "learning_rate": 0.889,
+        "num_leaves": 20,
+    },
+    'n_vbbs': {
+        'max_depth': 2,
+        "objective": "binary",
+        "boosting_type": "gbdt",
+        "learning_rate": 1.0,
+        "num_leaves": 160,
+    },
+    'n_pdt': {
+        'max_depth': 2,
+        "objective": "binary",
+        "boosting_type": "gbdt",
+        "learning_rate": 0.47336,
+        "num_leaves": 10,
+    },
+    'n_btv': {
+        'max_depth': 2,
+        "objective": "binary",
+        "boosting_type": "gbdt",
+        "learning_rate": 0.47336363636363643,
+        "num_leaves": 10,
+    },
+    'n_mio': {
+        'max_depth': 2,
+        "objective": "binary",
+        "boosting_type": "gbdt",
+        "learning_rate": 0.355273,
+        "num_leaves": 10,
+    },
+    'n_r': {
+        'max_depth': 2,
+        "objective": "binary",
+        "boosting_type": "gbdt",
+        "learning_rate": 0.355273,
+        "num_leaves": 10,
+    },
+}

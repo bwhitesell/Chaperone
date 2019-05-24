@@ -194,7 +194,7 @@ def build_risk_map(rfc, time_of_day):
     
     # Initialize the map:
     m = folium.Map(location=[34.074904, -118.376525], zoom_start=16)
-    colorscale = branca.colormap.linear.RdPu_09.scale(0, rfc.predict_proba(points)[:,1].max())
+    colorscale = branca.colormap.linear.RdPu_09.scale(0, np.sqrt(rfc.predict_proba(points)[:,1].max()))
 
     # Add the color for the chloropleth:
 
@@ -205,7 +205,7 @@ def build_risk_map(rfc, time_of_day):
             'stroke': False,
             'fillOpacity' : 0.4,
             'smoothFactor':0,
-            'color': colorscale(cd[feature['id']]['risk']),
+            'color': colorscale(np.sqrt(cd[feature['id']]['risk'])),
             'dashArray': '1000, 100',
             'legend_name': 'Theft Risk (%)'
         }

@@ -18,8 +18,8 @@ class EngineerFeaturesLocationTimeSamples(SparkCrymeTask, SearchForCrimesMixin):
 
     def run(self):
         crime_incidents = self.spark.read.parquet(self.input_file)
-        #crime_incidents = crime_incidents.withColumn('lat', add_noise_to_lat_udf(crime_incidents.lat))
-        #crime_incidents = crime_incidents.withColumn('lon', add_noise_to_lon_udf(crime_incidents.lon))
+        crime_incidents = crime_incidents.withColumn('lat', add_noise_to_lat_udf(crime_incidents.lat))
+        crime_incidents = crime_incidents.withColumn('lon', add_noise_to_lon_udf(crime_incidents.lon))
         loc_time_samples = self.load_df_from_cp('location_time_samples')
         loc_time_samples = loc_time_samples.withColumn('lat_bb', actb_lat(loc_time_samples.latitude))
         loc_time_samples = loc_time_samples.withColumn('lon_bb', actb_lon(loc_time_samples.longitude))

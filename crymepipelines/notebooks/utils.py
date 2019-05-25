@@ -9,6 +9,15 @@ import pandas as pd
 import folium
 import branca
 
+import os
+import sys
+CRYMEPIPELINES_PATH = '/home/ben/.envs/cc/CrymeClarity/crymepipelines/src'
+sys.path.insert(0, CRYMEPIPELINES_PATH)
+
+from shared.objects.geometries import GeometricRegion
+la = GeometricRegion(id=1)
+
+
 
 # Define native python mappings here
 def assign_coordinate_to_lat_box(latitude):
@@ -189,12 +198,20 @@ def build_risk_map(rfc, time_of_day):
     points = [i + [time_of_day] for i in points]
     points = np.array(points)
     c = rfc.predict_proba(points)[:,1]
-    crime_risk = pd.DataFrame({'id': point_ids, 'risk': rfc.predict_proba(points)[:,1]})
+    in_domain = [True if la.in_domain(i[0], i[1]) else False for i in points]
+    crime_risk = pd.DataFrame({'id': point_ids, 'risk': rfc.predict_proba(points)[:,1], 'in_domain': in_domain})
+    crime_risk = crime_risk[crime_risk['in_domain'] == True]
     cd = crime_risk.set_index('id').to_dict('index')
     
     # Initialize the map:
     m = folium.Map(location=[34.074904, -118.376525], zoom_start=16)
     colorscale = branca.colormap.linear.RdPu_09.scale(0, np.sqrt(rfc.predict_proba(points)[:,1].max()))
+    def col_mapping(feat):
+        if feat['id'] not in cd:
+            return 0.0
+        else:
+            return colorscale(np.sqrt(cd[feat['id']]['risk']))
+        
 
     # Add the color for the chloropleth:
 
@@ -205,7 +222,7 @@ def build_risk_map(rfc, time_of_day):
             'stroke': False,
             'fillOpacity' : 0.4,
             'smoothFactor':0,
-            'color': colorscale(np.sqrt(cd[feature['id']]['risk'])),
+            'color': col_mapping(feature),
             'dashArray': '1000, 100',
             'legend_name': 'Theft Risk (%)'
         }

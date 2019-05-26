@@ -827,6 +827,7 @@ var Charts = (function() {
 		var options = elem.data('update');
 		var $target = $(elem.data('target'));
 		var $chart = $target.data('chart');
+		console.log(options)
 
 		// Parse options
 		parseOptions($chart, options);
@@ -844,6 +845,7 @@ var Charts = (function() {
 		if (elem.data('prefix') !== undefined || elem.data('prefix') !== undefined) {
 			var prefix = elem.data('prefix') ? elem.data('prefix') : '';
 			var suffix = elem.data('suffix') ? elem.data('suffix') : '';
+			var max = elem.data('max') ? elem.data('max') : 0;
 
 			// Update ticks
 			$chart.options.scales.yAxes[0].ticks.callback = function(value) {
@@ -1015,7 +1017,9 @@ var SalesChart = (function() {
 						ticks: {
 							callback: function(value) {
 								return  + value + '%';
-							}
+							},
+							min: 0, //minimum tick
+                            max: 100, //
 						}
 					}]
 				},
@@ -1030,7 +1034,7 @@ var SalesChart = (function() {
 								content += '<span class="popover-body-label mr-auto">' + label + '</span>';
 							}
 
-							content += '<span class="popover-body-value">$' + yLabel + 'k</span>';
+							content += '<span class="popover-body-value">' + yLabel + '</span>';
 							return content;
 						}
 					}
@@ -1038,10 +1042,10 @@ var SalesChart = (function() {
 			},
 			data: {
 				labels: ['1 AM', '2 AM', '3 AM', '4 AM', '5 AM', '6 AM', '7 AM', '8 AM', '9 AM', '10 AM',
-				'11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM', '6PM', '7 PM', '8PM', '9PM', '10PM', '11 PM', '12AM'],
+				'11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM', '6PM', '7 PM', '8PM', '9PM', '10PM', '11 PM', '12AM',],
 				datasets: [{
-					label: 'Performance',
-					data: [0, 20, 10, 30, 15, 40, 20, 60, 60, 0, 20, 10, 30, 15, 40, 20, 60, 33, 78, 22, 55, 41, 60, 55, 85, 90]
+					label: 'Risk',
+					data: [0, 20, 10, 30, 15, 40, 20, 60, 60, 0, 20, 10, 30, 15, 40, 20, 60, 33, 78, 22, 55, 41, 60, 55]
 				}]
 			}
 		});

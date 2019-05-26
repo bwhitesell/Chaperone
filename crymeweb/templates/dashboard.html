@@ -1,0 +1,400 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'nav/navbar.html' %}
+<div class="main-content">
+    <!-- Header -->
+    <div class="header bg-gradient-primary pb-1 pt-5 pt-md-3">
+      <div class="container-fluid">
+        <div class="header-body">
+            <div class="row" style="padding: None;">
+                <br>
+                <br>
+                <br>
+                <h1 class="text-white mb-0  text-uppercase text-muted mb-0"> Westfield Century City</h1>
+                <br>
+                <br>
+                <br>
+            </div>
+          <!-- Card stats -->
+            <div class="row" style="padding: None;">
+        <div class="col-xl-8 mb-5 mb-xl-0">
+          <div class="card bg-gradient-default shadow">
+            <div class="card-header bg-transparent">
+              <div class="row align-items-center">
+                <div class="col-md-3">
+                  <h2 class="text-white mb-0">Crime Risk</h2>
+                    <h6 class="text-uppercase text-light ls-1 mb-1">24 Hours</h6>
+
+                </div>
+                <div class="col-md-9">
+                  <ul class="nav nav-pills justify-content-end">
+                    <li class="nav-item mr-2 mr-md-0" data-toggle="chart" data-target="#Sales-chart" data-update='{"data":{"datasets":[{"data":{{ risk_chart_values.n_t }} }]}}'>
+                      <a href="#" class="nav-link py-2 px-3 active" data-toggle="tab">
+                        <span class="d-none d-md-block">Theft</span>
+                        <span class="d-md-none">T</span>
+                      </a>
+                    </li>
+                    <li class="nav-item" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ risk_chart_values.n_t }} }]}}'>
+                      <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
+                        <span class="d-none d-md-block">Week</span>
+                        <span class="d-md-none">W</span>
+                      </a>
+                    </li>
+                    <li class="nav-item" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":[0, 20, 5, 25, 10, 30, 15, 40, 40]}]}}' data-prefix="$" data-suffix="k">
+                      <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
+                        <span class="d-none d-md-block">Week</span>
+                        <span class="d-md-none">W</span>
+                      </a>
+                    </li>
+                    <li class="nav-item" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":[0, 20, 5, 25, 10, 30, 15, 40, 40]}]}}' data-prefix="$" data-suffix="k">
+                      <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
+                        <span class="d-none d-md-block">Week</span>
+                        <span class="d-md-none">W</span>
+                      </a>
+                    </li>
+                    <li class="nav-item" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":[0, 20, 5, 25, 10, 30, 15, 40, 40]}]}}' data-prefix="$" data-suffix="k">
+                      <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
+                        <span class="d-none d-md-block">Week</span>
+                        <span class="d-md-none">W</span>
+                      </a>
+                    </li>
+                    <li class="nav-item" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":[0, 20, 5, 25, 10, 30, 15, 40, 40]}]}}' data-prefix="$" data-suffix="k">
+                      <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
+                        <span class="d-none d-md-block">Week</span>
+                        <span class="d-md-none">W</span>
+                      </a>
+                    </li>
+                    <li class="nav-item" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":[0, 20, 5, 25, 10, 30, 15, 40, 40]}]}}' data-prefix="$" data-suffix="k">
+                      <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
+                        <span class="d-none d-md-block">Week</span>
+                        <span class="d-md-none">W</span>
+                      </a>
+                    </li>
+                    <li class="nav-item" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":[0, 20, 5, 25, 10, 30, 15, 40, 40]}]}}' data-prefix="$" data-suffix="k">
+                      <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
+                        <span class="d-none d-md-block">Week</span>
+                        <span class="d-md-none">W</span>
+                      </a>
+                    </li>
+                    <li class="nav-item" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":[0, 20, 5, 25, 10, 30, 15, 40, 40]}]}}' data-prefix="$" data-suffix="k">
+                      <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
+                        <span class="d-none d-md-block">Week</span>
+                        <span class="d-md-none">W</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Chart -->
+              <div class="chart">
+                <!-- Chart wrapper -->
+                <canvas id="chart-sales" class="chart-canvas"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4">
+          <div class="card shadow">
+            <div class="card-header bg-transparent">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h4 class="text-uppercase text-muted ls-1 mb-1">Location</h4>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Chart -->
+              <div class="mini-map" style="margin: auto;">
+                <div class="embed-responsive embed-responsive-16by9">
+                  <iframe height=300, width="600" style="display:block; margin: auto; " frameborder="0" scrolling="no" src="https://www.openstreetmap.org/export/embed.html?bbox=-118.42281103134157%2C34.05599276475328%2C-118.41527402400972%2C34.06152582536711&amp;layer=mapnik&amp;marker=34.058759340211054%2C-118.41904252767563" ></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page content -->
+    <div class="container-fluid mt--3">
+  <div class="row">
+            <div class="col-xl-3 col-lg-6">
+              {% include 'cards/theft-now-card.html' %}
+            </div>
+            <div class="col-xl-3 col-lg-6">
+              {% include 'cards/burglary-now-card.html' %}
+            </div>
+             <div class="col-xl-3 col-lg-6">
+              {% include 'cards/assault-battery-now-card.html' %}
+            </div>
+              <div class="col-xl-3 col-lg-6">
+                 {% include 'cards/assault-battery-now-card.html' %}
+            </div>
+          </div>
+          <div class="row">
+             <div class="col-xl-3 col-lg-6">
+              {% include 'cards/burglary-theft-from-vehicle-now-card.html' %}
+              </div>
+             <div class="col-xl-3 col-lg-6">
+                {% include 'cards/shoplifting-pickpocketing-now-card.html' %}
+            </div>
+            <div class="col-xl-3 col-lg-6">
+                {% include 'cards/vehicle-bike-boat-stolen-now-card.html' %}
+            </div>
+            <div class="col-xl-3 col-lg-6">
+                {% include 'cards/misc-infrequent-offenses-now-card.html' %}
+            </div>
+          </div>
+      <div class="row mt-5">
+        <div class="col-xl-8 mb-5 mb-xl-0">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h3 class="mb-0">Recent Crimes (Nearby)</h3>
+                </div>
+                <div class="col text-right">
+                  <a href="#!" class="btn btn-sm btn-primary">See all</a>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <!-- Projects table -->
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Page name</th>
+                    <th scope="col">Visitors</th>
+                    <th scope="col">Unique users</th>
+                    <th scope="col">Bounce rate</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">
+                      /argon/
+                    </th>
+                    <td>
+                      4,569
+                    </td>
+                    <td>
+                      340
+                    </td>
+                    <td>
+                      <i class="fas fa-arrow-up text-success mr-3"></i> 46,53%
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      /argon/index.html
+                    </th>
+                    <td>
+                      3,985
+                    </td>
+                    <td>
+                      319
+                    </td>
+                    <td>
+                      <i class="fas fa-arrow-down text-warning mr-3"></i> 46,53%
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      /argon/charts.html
+                    </th>
+                    <td>
+                      3,513
+                    </td>
+                    <td>
+                      294
+                    </td>
+                    <td>
+                      <i class="fas fa-arrow-down text-warning mr-3"></i> 36,49%
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      /argon/tables.html
+                    </th>
+                    <td>
+                      2,050
+                    </td>
+                    <td>
+                      147
+                    </td>
+                    <td>
+                      <i class="fas fa-arrow-up text-success mr-3"></i> 50,87%
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      /argon/profile.html
+                    </th>
+                    <td>
+                      1,795
+                    </td>
+                    <td>
+                      190
+                    </td>
+                    <td>
+                      <i class="fas fa-arrow-down text-danger mr-3"></i> 46,53%
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h3 class="mb-0">Social traffic</h3>
+                </div>
+                <div class="col text-right">
+                  <a href="#!" class="btn btn-sm btn-primary">See all</a>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <!-- Projects table -->
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Referral</th>
+                    <th scope="col">Visitors</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">
+                      Facebook
+                    </th>
+                    <td>
+                      1,480
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <span class="mr-2">60%</span>
+                        <div>
+                          <div class="progress">
+                            <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      Facebook
+                    </th>
+                    <td>
+                      5,480
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <span class="mr-2">70%</span>
+                        <div>
+                          <div class="progress">
+                            <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width: 70%;"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      Google
+                    </th>
+                    <td>
+                      4,807
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <span class="mr-2">80%</span>
+                        <div>
+                          <div class="progress">
+                            <div class="progress-bar bg-gradient-primary" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      Instagram
+                    </th>
+                    <td>
+                      3,678
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <span class="mr-2">75%</span>
+                        <div>
+                          <div class="progress">
+                            <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      twitter
+                    </th>
+                    <td>
+                      2,645
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <span class="mr-2">30%</span>
+                        <div>
+                          <div class="progress">
+                            <div class="progress-bar bg-gradient-warning" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" style="width: 30%;"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="row align-items-center justify-content-xl-between">
+          <div class="col-xl-6">
+            <div class="copyright text-center text-xl-left text-muted">
+              &copy; 2018 <a href="https://www.creative-tim.com" class="font-weight-bold ml-1" target="_blank">Creative Tim</a>
+            </div>
+          </div>
+          <div class="col-xl-6">
+            <ul class="nav nav-footer justify-content-center justify-content-xl-end">
+              <li class="nav-item">
+                <a href="https://www.creative-tim.com" class="nav-link" target="_blank">Creative Tim</a>
+              </li>
+              <li class="nav-item">
+                <a href="https://www.creative-tim.com/presentation" class="nav-link" target="_blank">About Us</a>
+              </li>
+              <li class="nav-item">
+                <a href="http://blog.creative-tim.com" class="nav-link" target="_blank">Blog</a>
+              </li>
+              <li class="nav-item">
+                <a href="https://github.com/creativetimofficial/argon-dashboard/blob/master/LICENSE.md" class="nav-link" target="_blank">MIT License</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+
+{% endblock %}

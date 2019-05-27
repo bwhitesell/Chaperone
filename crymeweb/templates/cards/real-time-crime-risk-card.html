@@ -25,7 +25,18 @@
           {% endif %}
         </div>
         <div class="col-auto">
-          <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+          {% if risk_est.rating == 'Low' %}
+            <div class="icon icon-shape bg-success text-white rounded-circle shadow">
+          {% endif %}
+          {% if risk_est.rating == 'Average' %}
+            <div class="icon icon-shape bg-info text-white rounded-circle shadow">
+          {% endif %}
+          {% if risk_est.rating == 'Elevated' %}
+            <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+          {% endif %}
+          {% if risk_est.rating == 'High' %}
+            <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+          {% endif %}
             <i class="fas fa-chart-bar"></i>
           </div>
         </div>

@@ -3956,8 +3956,6 @@ fieldset:disabled a.btn
     font-size: 1.25rem;
     line-height: 1.5;
 
-    padding: .875rem 1rem;
-
     border-radius: .4375rem;
 }
 
@@ -21877,4 +21875,13 @@ html:not([dir='rtl']) .noUi-horizontal .noUi-handle
   position: relative;
   width:100%;
   height: 413px;
+}
+
+.home-search {
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+  fill: #11cdef;
+
+
 }

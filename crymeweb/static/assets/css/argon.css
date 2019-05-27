@@ -21878,10 +21878,14 @@ html:not([dir='rtl']) .noUi-horizontal .noUi-handle
 }
 
 .home-search {
-  margin: auto;
-  width: 50%;
-  padding: 10px;
-  fill: #11cdef;
+      margin: auto;
+      width: 70%;
+      padding: 10px;
+      fill: #11cdef;
+    }
 
-
+@media only screen and (max-width: 800px) {
+    .home-search {
+      width: 100%;
+    }
 }

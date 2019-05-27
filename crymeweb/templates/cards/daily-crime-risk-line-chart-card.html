@@ -8,66 +8,19 @@
         </div>
         <div class="col-md-9">
           <ul class="nav nav-pills justify-content-end">
-            <li class="nav-item mr-2 mr-md-0 py-1" id="lead-tab" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ charting_data.n_t.values }} }]}}'>
+            {% for model in real_time_risk_ests %}
+            {% if forloop.counter ==  1 %}
+            <li class="nav-item mr-2 mr-md-0 py-1" id="lead-tab" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ model.24_hr_risk }}}]}}'>
               <a href="#" class="nav-link py-2 px-3 active" data-toggle="tab">
-                <span class="d-none d-md-block">Theft</span>
-                <span class="d-md-none">T</span>
+            {% else %}
+            <li class="nav-item py-1" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ model.24_hr_risk }} }]}}'>
+             <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
+            {% endif %}
+               <span class="d-none d-md-block">{{ model.name }}</span>
+               <span class="d-md-none">{{ model.name }}</span>
               </a>
             </li>
-            <li class="nav-item py-1" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ charting_data.n_b.values }} }]}}'>
-              <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
-                <span class="d-none d-md-block">Burglary</span>
-                <span class="d-md-none">B</span>
-              </a>
-            </li>
-            <li class="nav-item py-1" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ charting_data.n_ab.values }} }]}}'>
-              <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
-                <span class="d-none d-md-block">Assault / Battery</span>
-                <span class="d-md-none">AB</span>
-              </a>
-            </li>
-            <li class="nav-item py-1" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ charting_data.n_sp.values }} }]}}'>
-              <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
-                <span class="d-none d-md-block">Shoplifting / Pickpocketing</span>
-                <span class="d-md-none">SP</span>
-              </a>
-            </li>
-            <li class="nav-item py-1" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ charting_data.n_pdt.values }} }]}}'>
-              <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
-                <span class="d-none d-md-block">Property Damage / Threats</span>
-                <span class="d-md-none">PDT</span>
-              </a>
-            </li>
-            <li class="nav-item py-1" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ charting_data.n_btv.values }} }]}}'>
-              <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
-                <span class="d-none d-md-block">Burglary / Theft From Vehicle</span>
-                <span class="d-md-none">BTV</span>
-              </a>
-            </li>
-            <li class="nav-item py-1" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ charting_data.n_ltvc.values }} }]}}'>
-              <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
-                <span class="d-none d-md-block">Life Threatening Violent Crimes</span>
-                <span class="d-md-none">LTVC</span>
-              </a>
-            </li>
-            <li class="nav-item py-1" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ charting_data.n_vbbs.values }} }]}}'>
-              <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
-                <span class="d-none d-md-block">Vehicle / Bike Stolen</span>
-                <span class="d-md-none">VBS</span>
-              </a>
-            </li>
-            <li class="nav-item py-1" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ charting_data.n_mio.values }} }]}}'>
-              <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
-                <span class="d-none d-md-block">Misc. Infrequent Offenses</span>
-                <span class="d-md-none">MIO</span>
-              </a>
-            </li>
-            <li class="nav-item py-1" data-toggle="chart" data-target="#chart-sales" data-update='{"data":{"datasets":[{"data":{{ charting_data.n_r.values }} }]}}'>
-              <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
-                <span class="d-none d-md-block">Robbery</span>
-                <span class="d-md-none">R</span>
-              </a>
-            </li>
+            {% endfor %}
           </ul>
         </div>
       </div>
@@ -82,6 +35,6 @@
 </div>
 
 <script>
-  var initData = {{ charting_data.n_t.values }}
-  var initMax = {{ charting_data.max }}
+  var initData = {{ real_time_risk_ests.0.24_hr_risk }}
+  var initMax = {{ y_axis_max }}
 </script>

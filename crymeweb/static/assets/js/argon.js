@@ -824,6 +824,7 @@ var Charts = (function() {
 
 	// Update options
 	function updateOptions(elem) {
+	    console.log(elem);
 		var options = elem.data('update');
 		var $target = $(elem.data('target'));
 		var $chart = $target.data('chart');
@@ -1019,7 +1020,7 @@ var SalesChart = (function() {
 								return  + value + '%';
 							},
 							min: 0, //minimum tick
-                            max: 100, //
+                            max: initMax, //
 						}
 					}]
 				},
@@ -1045,7 +1046,7 @@ var SalesChart = (function() {
 				'11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM', '6PM', '7 PM', '8PM', '9PM', '10PM', '11 PM', '12AM',],
 				datasets: [{
 					label: 'Risk',
-					data: [0, 20, 10, 30, 15, 40, 20, 60, 60, 0, 20, 10, 30, 15, 40, 20, 60, 33, 78, 22, 55, 41, 60, 55]
+					data: initData
 				}]
 			}
 		});

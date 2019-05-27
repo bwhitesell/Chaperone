@@ -33,7 +33,7 @@
               <!-- Chart -->
               <div class="mini-map" style="margin: auto;">
                 <div class="embed-responsive embed-responsive-map embed-responsive-16by9">
-                  <iframe style="display:block; margin: auto; height: 500px; " frameborder="0" scrolling="no" src="https://www.openstreetmap.org/export/embed.html?bbox=-118.42281103134157%2C34.05599276475328%2C-118.41527402400972%2C34.06152582536711&amp;layer=mapnik&amp;marker=34.058759340211054%2C-118.41904252767563" ></iframe>
+                  <iframe style="display:block; margin: auto; height: 500px; " frameborder="0" scrolling="no" src="https://www.openstreetmap.org/export/embed.html?bbox={{ view_box.bl_lat }}%2C{{ view_box.bl_lon }}%2C{{ view_box.tr_lat }}%2C{{ view_box.tr_lon }}&amp;layer=mapnik&amp;marker={{ view_box.point_lon }}%2C{{ view_box.point_lat }}" ></iframe>
                 </div>
               </div>
             </div>
@@ -46,32 +46,17 @@
     <!-- Page content -->
     <div class="container-fluid mt--3">
   <div class="row">
-            <div class="col-xl-3 col-lg-6">
-              {% include 'cards/theft-now-card.html' %}
-            </div>
-            <div class="col-xl-3 col-lg-6">
-              {% include 'cards/burglary-now-card.html' %}
-            </div>
-             <div class="col-xl-3 col-lg-6">
-              {% include 'cards/assault-battery-now-card.html' %}
-            </div>
+            {% for risk_est in risk_ests_row_1 %}
               <div class="col-xl-3 col-lg-6">
-                 {% include 'cards/assault-battery-now-card.html' %}
-            </div>
-          </div>
-          <div class="row">
-             <div class="col-xl-3 col-lg-6">
-              {% include 'cards/burglary-theft-from-vehicle-now-card.html' %}
+                {% include 'cards/real-time-crime-risk-card.html' %}
               </div>
+            {% endfor %}
+          <div class="row">
+            {% for risk_est in risk_ests_row_2 %}
              <div class="col-xl-3 col-lg-6">
-                {% include 'cards/shoplifting-pickpocketing-now-card.html' %}
-            </div>
-            <div class="col-xl-3 col-lg-6">
-                {% include 'cards/vehicle-bike-boat-stolen-now-card.html' %}
-            </div>
-            <div class="col-xl-3 col-lg-6">
-                {% include 'cards/misc-infrequent-offenses-now-card.html' %}
-            </div>
+               {% include 'cards/real-time-crime-risk-card.html' %}
+             </div>
+            {% endfor %}
           </div>
       <div class="row mt-5">
         <div class="col-xl-8 mb-5 mb-xl-0">

@@ -46,7 +46,6 @@ class CrymeClassifier(models.Model):
         est_pos_prob = self.clf.predict_proba(
             np.array([[lon, lat, datetime_to_minutes_into_day(now)]])
         )[0][1]
-
         return est_pos_prob, self.get_risk_rating(est_pos_prob)
 
     def get_risk_rating(self, positive_prob_est):
@@ -56,5 +55,5 @@ class CrymeClassifier(models.Model):
             return 'Average'
         elif self.risk_rating_medium < positive_prob_est <= self.risk_rating_high:
             return 'Elevated'
-        elif self.risk_rating_high < positive_prob_est <= self.risk_rating_very_high:
+        elif self.risk_rating_high < positive_prob_est:
             return 'High'

@@ -1,12 +1,11 @@
 {
-  "name": "creativetimofficial/argon-dashboard-free",
-  "description": "A beautiful Dashboard for Bootstrap 4. It is Free and Open Source.",
+  "name": "cc",
+  "description": "A Safety Analytics Application",
   "type": "project",
-  "license": "MIT",
   "authors": [
     {
-      "name": "Creative Tim",
-      "email": "support@creative-tim.com"
+      "name": "dev",
+      "email": "dev@crymeclarity.com"
     }
   ],
   "require": {}

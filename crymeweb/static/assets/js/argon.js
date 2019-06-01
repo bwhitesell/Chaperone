@@ -1066,5 +1066,75 @@ var SalesChart = (function() {
 
 })();
 
+var CrimeVolumeChart = (function() {
+
+	// Variables
+
+	var $chart = $('#cv-chart');
+
+
+	// Methods
+
+	function init($chart) {
+
+		var crimeVolumeChart = new Chart($chart, {
+			type: 'line',
+			options: {
+				scales: {
+					yAxes: [{
+						gridLines: {
+							color: Charts.colors.gray[900],
+							zeroLineColor: Charts.colors.gray[900]
+						},
+						ticks: {
+							callback: function(value) {
+								return  + value;
+							},
+							min: 0, //minimum tick
+                            max: initMax, //
+						}
+					}]
+				},
+				tooltips: {
+					callbacks: {
+						label: function(item, data) {
+							var label = data.datasets[item.datasetIndex].label || '';
+							var yLabel = item.yLabel;
+							var content = '';
+
+							if (data.datasets.length > 1) {
+								content += '<span class="popover-body-label mr-auto">' + label + '</span>';
+							}
+
+							content += '<span class="popover-body-value">' + yLabel + '</span>';
+							return content;
+						}
+					}
+				}
+			},
+			data: {
+				labels: initLabels,
+				datasets: [{
+					label: 'Day',
+					data: initData
+				}]
+			}
+		});
+
+		// Save to jQuery object
+
+		$chart.data('chart', salesChart);
+
+	};
+
+
+	// Events
+
+	if ($chart.length) {
+		init($chart);
+	}
+
+})();
+
 
 

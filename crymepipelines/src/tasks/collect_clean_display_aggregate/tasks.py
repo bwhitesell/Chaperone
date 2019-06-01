@@ -11,7 +11,6 @@ from ..mappings import ts_conv, crime_group_assignment_udf, t_occ_conv, actb_lat
 
 
 class GenerateLocationTimeSamples(NativeCrymeTask):
-
     def run(self):
         sm = SamplesManager()
         cf_freshness = cf_conn.get_recency_data()
@@ -109,5 +108,8 @@ class AggregateCrimesByPremises(SparkCrymeTask):
         by_type = by_type.withColumnRenamed("count(_id)", "volume")
 
         self.write_to_cw(by_type.limit(10), 'crime_crimespremisesvolume')
+
+
+
 
 

@@ -11,5 +11,6 @@ urlpatterns = [
     path('', home_view, name='test'),
     path('search', search_view, name='search'),
     path('dashboard', dashboard_view, name='dashboard'),
+    path('records/<int:pg>', crime_records_view, name='records'),
 ]
 

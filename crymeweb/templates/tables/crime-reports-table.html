@@ -1,0 +1,43 @@
+<div class="table-responsive">
+  <!-- Recent Crimes Table -->
+  <table class="table align-items-center table-flush">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">Incident ID</th>
+        <th scope="col">Crime Description</th>
+        <th scope="col">Date Occured</th>
+        <th scope="col">Time Occured (24 Hrs)</th>
+        <th scope="col">Premises</th>
+        <th scope="col">Longitude</th>
+        <th scope="col">Latitude</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for crime_incident in crime_reports %}
+      <tr>
+          <td>
+            {{ crime_incident.row_id }}
+          </td>
+          <td>
+            {{ crime_incident.crm_cd_desc }}
+          </td>
+          <td>
+            {{ crime_incident.date_occ_str }}
+          </td>
+          <td>
+            {{ crime_incident.time_occ }}
+          </td>
+          <td>
+            {{ crime_incident.premis_desc }}
+          </td>
+          <td>
+            {{ crime_incident.lon }}
+          </td>
+          <td>
+            {{ crime_incident.lat }}
+          </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>

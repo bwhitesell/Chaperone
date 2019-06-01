@@ -1,0 +1,24 @@
+<div class="card bg-gradient-default shadow">
+    <div class="card-header bg-transparent">
+      <div class="row align-items-center">
+        <div class="col-md-3">
+          <h2 class="text-white mb-0">Number of Crimes (Daily)</h2>
+        </div>
+        <div class="col-md-9">
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Chart -->
+      <div class="chart">
+        <!-- Chart wrapper -->
+        <canvas id="cv-chart" class="chart-canvas"></canvas>
+      </div>
+    </div>
+</div>
+
+<script>
+  var initData = {{ daily_crime_vol_data }}
+  var initLabels = {{ daily_crime_vol_labels|safe  }}
+  var initMax = {{ max_chart_val }}
+</script>

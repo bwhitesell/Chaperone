@@ -15,21 +15,19 @@ yes Y | sudo apt-get install mongodb mysql-server libmysqlclient-dev python3-dev
 sudo add-apt-repository ppa:openjdk-r/ppa
 sudo apt-get update
 sudo apt-get install -y openjdk-8-jdk
+
 echo "# Java" | sudo tee -a $HOME/.bashrc
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" | sudo tee -a $HOME/.bashrc
 
-# install scala (yuck)
-sudo apt-get install scala
-
 
 # Install Spark
-curl -Lko /tmp/spark-2.4.3-bin-hadoop2.7.tgz http://apache.mirrors.lucidnetworks.net/spark/spark-2.4.3/spark-2.4.3-bin-hadoop2.7.tgz
+curl -Lko /tmp/spark-2.4.2-bin-hadoop2.7.tgz https://archive.apache.org/dist/spark/spark-2.4.2/spark-2.4.2-bin-hadoop2.7.tgz
 mkdir -p $HOME/spark
 cd $HOME
-tar -xvf /tmp/spark-2.4.3-bin-hadoop2.7.tgz -C $HOME/spark --strip-components=1
+tar -xvf /tmp/spark-2.4.2-bin-hadoop2.7.tgz -C $HOME/spark --strip-components=1
 
-echo "# Spark" | sudo tee -a $HOME/.bashrc
+echo "# Spark environment setup" | sudo tee -a $HOME/.bashrc
 export SPARK_HOME=$HOME/spark
 echo 'export SPARK_HOME=$HOME/spark' | sudo tee -a $HOME/.bashrc
 export PATH=$PATH:$SPARK_HOME/bin

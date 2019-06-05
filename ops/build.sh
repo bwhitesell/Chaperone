@@ -124,7 +124,10 @@ echo "SPARK_HOME=$SPARK_HOME" | sudo tee -a /etc/sysconfig/airflow
 echo "AIRFLOW_CONFIG=$AIRFLOW_HOME/airflow.cfg" | sudo tee -a /etc/sysconfig/airflow
 echo "PATH=$PATH" | sudo tee -a /etc/sysconfig/airflow
 
-sudo ln -s $HOME/.envs/cc/CrymeClarity/crymepipelines/cp_dags.py $AIRFLOW_HOME/dags
+mkdir $AIRFLOW_HOME/dags
+sudo ln -s $HOME/.envs/cc/CrymeClarity/crymepipelines/dags/clean_agg_pipe_dag.py $AIRFLOW_HOME/dags
+sudo ln -s $HOME/.envs/cc/CrymeClarity/crymepipelines/dags/predict_eval_dag.py $AIRFLOW_HOME/dags
+
 
 cd $AIRFLOW_HOME
 airflow initdb
@@ -178,8 +181,6 @@ cd $HOME/.envs/cc/CrymeClarity/crymeweb/
 ./manage.py migrate
 yes Y | ./manage.py collectstatic
 #download default model
-curl -o $HOME/.envs/cc/CrymeClarity/crymeweb/bin/rfc_cryme_classifier_2019_03_31.p https://s3-us-west-1.amazonaws.com/crymeclarity/rcf_cryme_classifier_2019-03-31.p
-$HOME/.envs/cc/CrymeClarity/crymeweb/manage.py publish_model 'rfc_cryme_classifier_2019_03_31' '0.1' 'PC' --guarantee
 
 sudo systemctl stop gunicorn.service
 sudo systemctl stop gunicorn.socket

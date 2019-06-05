@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'nav/navbar.html' %}
+<div class="main-content">
+    <!-- Header -->
+    <div class="header bg-gradient-info pb-1 pt-5 pt-md-3">
+      <div class="container-fluid">
+        <div class="header-body">
+            <div class="row" style="padding: None;">
+
+                <h1 style="padding: 10px" class="text-white mb-0  text-uppercase text-muted mb-0"> {{ name }}</h1>
+
+            </div>
+          <!-- Card stats -->
+            <div class="row" style="padding: None;">
+        <div class="col-xl-8 mb-5 mb-xl-0">
+          {% include 'cards/daily-crime-risk-line-chart-card.html' %}
+        </div>
+        <div class="col-xl-4 mb-5 mb-xl-0">
+          {% include 'cards/proximity-map-card.html' %}
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page content -->
+    <div class="container-fluid mt--3">
+  <div class="row">
+            {% for risk_est in risk_ests_row_1 %}
+              <div class="col-xl-3 col-lg-6">
+                {% include 'cards/real-time-crime-risk-card.html' %}
+              </div>
+            {% endfor %}
+          <div class="row">
+            {% for risk_est in risk_ests_row_2 %}
+             <div class="col-xl-3 col-lg-6">
+               {% include 'cards/real-time-crime-risk-card.html' %}
+             </div>
+            {% endfor %}
+          </div>
+  </div>
+      <div class="row mt-5">
+        <div class="col-xl-8 mb-5 mb-xl-0">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h3 class="mb-0">Recent Crimes (Nearby)</h3>
+                </div>
+              </div>
+            </div>
+            {% include 'tables/recent-crimes-table.html' %}
+          </div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="row align-items-center justify-content-xl-between">
+          <div class="col-xl-6">
+            <div class="copyright text-center text-xl-left text-muted">
+              &copy; 2019 <a href="https://www.crymeclarity.com" class="font-weight-bold ml-1" target="_blank">Chaperone</a>
+            </div>
+          </div>
+          <div class="col-xl-6">
+            <ul class="nav nav-footer justify-content-center justify-content-xl-end">
+              <li class="nav-item">
+                <a href="https://www.crymeclarity.com" class="nav-link" target="_blank">Chaperone</a>
+              </li>
+              <li class="nav-item">
+                <a href="https://www.crymeclarity.com/about" class="nav-link" target="_blank">About</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+
+{% endblock %}

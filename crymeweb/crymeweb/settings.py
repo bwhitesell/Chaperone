@@ -23,8 +23,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '3nbs80v_0de+3$!t58^-00)-z8@sv2o!@tmm3a8lqpoiw@)8=-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-debug_string = os.environ.get('DJANGO_DEBUG', 'True')
-DEBUG = False if debug_string == 'False' else True
+debug_string = os.environ.get('DJANGO_DEBUG', 'False')
+DEBUG = True if debug_string == 'True' else False
 
 ALLOWED_HOSTS = ['*']
 
@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'crime',
+    'classifiers',
+    'regions',
 ]
 
 MIDDLEWARE = [
@@ -110,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'US/Pacific'
 
 USE_I18N = True
 

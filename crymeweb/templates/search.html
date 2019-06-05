@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+    <div class="position-relative">
+      <section class="section section-lg section-hero section-shaped bg-gradient-info pb-8 pt-5 pt-md-5">
+        <div class="container shape-container d-flex align-items-center py-lg">
+          <div class="col px-0">
+            <div class="row align-items-center justify-content-center">
+              <div class="col-lg-6 text-center">
+                <a href="./">
+                  <img src="/static/assets/img/brand/Chaperone-white.png" style="width: 200px;" class="img-fluid">
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- SVG separator -->
+        <div class="separator separator-bottom separator-skew zindex-100">
+          <svg x="0" y="0" viewBox="0 0 2560 100" preserveAspectRatio="none" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <polygon style="fill: #F8F9FE;" points="2560 0 2560 100 0 100"></polygon>
+          </svg>
+        </div>
+      </section>
+    </div>
+        <div class="container-fluid" >
+          <div class="row justify-content-center" >
+            <div class="col-md-6">
+                 <table class="table table-responsive align-items-center table-flush">
+                    <thead class="thead-light">
+                      <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Location Type</th>
+                      </tr>
+                    </thead>
+                     {% for result in search_results %}
+                     <tr>
+                         <td>
+                             <a href="./dashboard?lon={{ result.lat }}&lat={{ result.lon }}&name={{ result.display_name }}">{{ result.display_name }} </a>
+                         </td>
+                         <td>
+                             {{ result.type }}
+                         </td>
+                     </tr>
+                     {% endfor %}
+                    <tbody>
+                    </tbody>
+                 </table>
+            </div>
+          </div>
+        </div>
+</main>
+{% endblock %}

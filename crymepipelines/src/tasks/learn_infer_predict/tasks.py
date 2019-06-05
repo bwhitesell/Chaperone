@@ -5,7 +5,7 @@ from pyspark.sql.functions import unix_timestamp
 
 from shared.settings import CF_TRUST_DELAY, START_DATE, cf_conn, cp_conn, TMP_DIR, BIN_DIR
 from ..base import SparkCrymeTask, NativeCrymeTask
-from ..constants import safety_rel_crimes, cc_hyperparams
+from ..constants import cc_hyperparameters
 from ..mappings import (ts_to_minutes_in_day_udf, ts_to_hour_of_day_udf, ts_to_day_of_week_udf, ts_conv,
                        crime_group_assignment_udf, t_occ_conv, actb_lat, actb_lon, row_to_list, add_noise_to_lon_udf,
                         add_noise_to_lat_udf)
@@ -18,8 +18,8 @@ class EngineerFeaturesLocationTimeSamples(SparkCrymeTask, SearchForCrimesMixin):
 
     def run(self):
         crime_incidents = self.spark.read.parquet(self.input_file)
-        #crime_incidents = crime_incidents.withColumn('lat', add_noise_to_lat_udf(crime_incidents.lat))
-        #crime_incidents = crime_incidents.withColumn('lon', add_noise_to_lon_udf(crime_incidents.lon))
+        crime_incidents = crime_incidents.withColumn('lat', add_noise_to_lat_udf(crime_incidents.lat))
+        crime_incidents = crime_incidents.withColumn('lon', add_noise_to_lon_udf(crime_incidents.lon))
         loc_time_samples = self.load_df_from_cp('location_time_samples')
         loc_time_samples = loc_time_samples.withColumn('lat_bb', actb_lat(loc_time_samples.latitude))
         loc_time_samples = loc_time_samples.withColumn('lon_bb', actb_lon(loc_time_samples.longitude))
@@ -96,7 +96,7 @@ class TrainCrymeClassifiers(NativeCrymeTask):
         features = ['longitude', 'latitude', 'time_minutes']
         for target in ['n_ab', 'n_b', 'n_t', 'n_btv', 'n_vbbs', 'n_pdt', 'n_ltvc', 'n_sp', 'n_mio', 'n_r']:
 
-            rfc = self._local_mod_access['LGBMClassifier'](**cc_hyperparams[target])
+            rfc = self._local_mod_access['CalibratedClassifierCV'](**cc_hyperparameters[target])
             rfc.fit(train_ds[features], train_ds[target])
             y_est = rfc.predict_proba(test_ds[features])
             ll = self._local_mod_access['log_loss'](test_ds[target], y_est)

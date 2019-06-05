@@ -1,0 +1,15 @@
+<div class="pagination">
+    <span class="step-links">
+        {% if crime_reports.has_previous %}
+            <a href="./{{ crime_reports.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ crime_reports.number }} of {{ crime_reports.paginator.num_pages }}.
+        </span>
+
+        {% if crime_reports.has_next %}
+            <a href="./{{ crime_reports.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>

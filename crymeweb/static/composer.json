@@ -1,0 +1,12 @@
+{
+  "name": "cc",
+  "description": "A Safety Analytics Application",
+  "type": "project",
+  "authors": [
+    {
+      "name": "dev",
+      "email": "dev@crymeclarity.com"
+    }
+  ],
+  "require": {}
+}

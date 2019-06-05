@@ -1,26 +1,29 @@
+import json
 from django.shortcuts import render
 from django.core.paginator import Paginator
 
-from .models import CrimeIncident, DailyCrimeVolume, CrimesPremisesVolume
+from .models import CrimeIncident, DailyCrimeVolume
 
 
 def crime_records_view(request, pg):
-    qs = CrimeIncident.objects.all().order_by('-date_occ_str')
+    # crime-records table processing
+    crime_records = CrimeIncident.objects.all().order_by('-date_occ_str')
+    paginator = Paginator(crime_records, 15)
+    viewable_reports = paginator.get_page(pg)
 
-    paginator = Paginator(CrimeIncident.objects.all().order_by('-date_occ_str'), 20)
-    crime_reports = paginator.get_page(pg)
-    daily_volume_dates, daily_volume_volumes = DailyCrimeVolume.objects.get_chart_data()
-    crime_prem_descriptions, crime_prem_volumes = CrimesPremisesVolume.objects.get_chart_data()
+    # crime-volume line chart processing
+    daily_crime_vol = DailyCrimeVolume.objects.all().order_by('date_occ_str').values_list(
+        'volume', 'date_occ_str'
+    )
+    daily_vols = [itm[0] for itm in daily_crime_vol]
+    daily_labels = [itm[1].split(' ')[0] for itm in daily_crime_vol]
 
     context = {
-        'reports': crime_reports,
-        'dates': daily_volume_dates,
-        'date_volumes': daily_volume_volumes,
-        'premises': crime_prem_descriptions,
-        'prem_volumes': crime_prem_volumes
+        'crime_reports': viewable_reports,
+        'daily_crime_vol_data': daily_vols,
+        'daily_crime_vol_labels': daily_labels,
+        'max_chart_val': int(max(daily_vols)),
+
     }
-    return render(request, 'crime/crimeReports.html', context=context)
+    return render(request, 'records.html', context=context)
 
-
-def test_view(request):
-    return render(request, 'crime/crimeByPremisesChart.html')

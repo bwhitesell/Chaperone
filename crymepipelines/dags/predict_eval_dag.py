@@ -58,7 +58,7 @@ t5.set_upstream(t4)
 
 # EVAL CRYME CLASSIFIER DAG #
 eval_cryme_classifier_dag = DAG('eval_cryme_classifier', default_args=default_args,
-                                schedule_interval='* 12 * * *', catchup=False)
+                                schedule_interval='0 12 * * *', catchup=False)
 t7 = BashOperator(
     task_id='clean_crime_incidents',
     bash_command=cli_args['spark-submit'] + 'run.py --task CleanCrimeIncidents',

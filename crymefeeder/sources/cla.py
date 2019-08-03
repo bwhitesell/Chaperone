@@ -18,7 +18,7 @@ class CLAAPI:
     timeout = REQUEST_TIMEOUT_LIMIT
     token = None
     headers = None
-    base_url = 'https://data.lacity.org/resource/7fvc-faax.json?$select=:*, *&$order=:id'
+    base_url = 'https://data.lacity.org/resource/63jg-8b9z.json?$select=:*, *&$order=:id'
 
     def __init__(self, token):
         self.token = token

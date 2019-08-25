@@ -6,43 +6,28 @@
           {% if risk_est.rating == 'Low' %}
             <span class="h2 font-weight-bold mb-0"> <font color='green'>{{ risk_est.risk }}%</font></span>
             <br>
-            <font color='#58b258' size="3px">Low</font>
           {% endif %}
           {% if risk_est.rating == 'Average' %}
             <span class="h2 font-weight-bold mb-0"> <font color='#fcc200 '>{{ risk_est.risk }}%</font></span>
             <br>
-            <font color='#ffd557' size="3px">Average</font>
           {% endif %}
           {% if risk_est.rating == 'Elevated' %}
             <span class="h2 font-weight-bold mb-0"> <font color='#e13d00'>{{ risk_est.risk }}%</font></span>
             <br>
-            <font color='#ff500f' size="3px">Elevated</font>
           {% endif %}
           {% if risk_est.rating == 'High' %}
             <span class="h2 font-weight-bold mb-0"> <font color='red'>{{ risk_est.risk }}%</font></span>
             <br>
-            <font color='#ff3c3c' size="3px">High</font>
           {% endif %}
         </div>
         <div class="col-auto">
-          {% if risk_est.rating == 'Low' %}
-            <div class="icon icon-shape bg-success text-white rounded-circle shadow">
-          {% endif %}
-          {% if risk_est.rating == 'Average' %}
             <div class="icon icon-shape bg-info text-white rounded-circle shadow">
-          {% endif %}
-          {% if risk_est.rating == 'Elevated' %}
-            <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
-          {% endif %}
-          {% if risk_est.rating == 'High' %}
-            <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
-          {% endif %}
-            <i class="fas fa-chart-bar"></i>
-          </div>
+              <i class="fas fa-chart-bar"></i>
+            </div>
         </div>
       </div>
       <p class="mt-3 mb-0 text-muted text-sm">
-        <span class="mr-2">Estimated probability a {{ risk_est.name }} occurs nearby in the next two hours.</span>
+        <span class="mr-2">Estimated probability a {{ risk_est.name }} is reported nearby in the next two hours.</span>
       </p>
     </div>
 </div>

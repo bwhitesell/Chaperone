@@ -57,3 +57,18 @@ class CrymeClassifier(models.Model):
             return 'Elevated'
         elif self.risk_rating_high < positive_prob_est:
             return 'High'
+
+
+class ModelPerformance(models.Model):
+    day = models.DateField()
+    log_loss_n_ab = models.FloatField()
+    log_loss_n_b = models.FloatField()
+    log_loss_n_t = models.FloatField()
+    log_loss_n_btv = models.FloatField()
+    log_loss_n_vbbs = models.FloatField()
+    log_loss_n_pdt = models.FloatField()
+    log_loss_n_ltvc = models.FloatField()
+    log_loss_n_sp = models.FloatField()
+    log_loss_n_mio = models.FloatField()
+    log_loss_n_r = models.FloatField()
+

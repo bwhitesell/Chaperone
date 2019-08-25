@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import os
 
+
 from shared.db.mysql.connection import CrymePipelinesMySqlConn
 from shared.db.mongo.connection import CrymePipelinesMongoConn
 
@@ -34,7 +35,14 @@ CF_TRUST_DELAY = timedelta(days=14)
 # Sampling Start Date
 # Data from over a year ago is not beneficial to the user experience or model performance, dont use any data
 # prior to this date
-START_DATE = datetime(year=2018, month=4, day=1).date()
+START_DATE = datetime(year=2018, month=7, day=1).date()
+
+
+# Model Train Date
+# The last date for which data will be used to train any models
+MODEL_TRAIN_DATE_END = datetime(year=2019, month=6, day=20)
+
+MODEL_TRAIN_DATE_START = MODEL_TRAIN_DATE_END - timedelta(days=300)
 
 
 

@@ -17,7 +17,6 @@ class SearchForCrimesMixin:
                     crime_incidents,
                     (subsample.lat_bb == crime_incidents.lat_bb_c) & (subsample.lon_bb == crime_incidents.lon_bb_c)
                 )
-
                 results_subsample = results_subsample.filter(
                     results_subsample.ts_occ_unix - results_subsample.timestamp_unix < 3600 * 2
                 )
@@ -28,8 +27,8 @@ class SearchForCrimesMixin:
                 results_subsample = results_subsample.withColumn('distance', space_dist(
                     results_subsample.longitude,
                     results_subsample.latitude,
-                    results_subsample.lon,
                     results_subsample.lat,
+                    results_subsample.lon,
                 ))
 
                 results_subsample = results_subsample.filter(results_subsample.distance < .25)
@@ -37,7 +36,6 @@ class SearchForCrimesMixin:
 
         # All local crime incidents found, count incidents per event and merge back with events sample
         results = results.groupBy("id", "crm_grp").count()
-
         results = results.withColumn('n_ab', udf(lambda x: 1 if x == 'AB' else 0)(results.crm_grp))
         results = results.withColumn('n_b', udf(lambda x: 1 if x == 'B' else 0)(results.crm_grp))
         results = results.withColumn('n_t', udf(lambda x: 1 if x == 'T' else 0)(results.crm_grp))

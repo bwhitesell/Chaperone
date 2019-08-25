@@ -77,7 +77,7 @@ t9 = BashOperator(
 
 t10 = BashOperator(
     task_id='engineer_features_daily_location_time_samples',
-    bash_command=cli_args['spark-submit'] + 'run.py --task EngineerFeaturesDailyLocationTimeSamples',
+    bash_command=cli_args['spark-submit'] + 'run.py --task EngineerFeaturesEvalTimeSamples',
     dag=eval_cryme_classifier_dag)
 
 t11 = BashOperator(

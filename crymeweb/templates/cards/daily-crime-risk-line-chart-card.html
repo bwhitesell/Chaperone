@@ -1,12 +1,7 @@
 <div class="card bg-gradient-default shadow">
     <div class="card-header bg-transparent">
       <div class="row align-items-center">
-        <div class="col-md-3">
-          <h2 class="text-white mb-0">Crime Risk</h2>
-            <h6 class="text-uppercase text-light ls-1 mb-1">24 Hours</h6>
-
-        </div>
-        <div class="col-md-9">
+        <div class="col-md-12">
           <ul class="nav nav-pills justify-content-end">
             {% for model in real_time_risk_ests %}
             {% if forloop.counter ==  1 %}
@@ -22,6 +17,12 @@
             </li>
             {% endfor %}
           </ul>
+        </div>
+      </div>
+      <div class="row align-items-center">
+        <div class="col-md-12">
+          <h2 class="text-white mb-0">Crime Risk</h2>
+          <h6 class="text-uppercase text-light ls-1 mb-1">24 Hours</h6>
         </div>
       </div>
     </div>

@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
-from pyspark.sql.functions import monotonically_increasing_id, unix_timestamp
+from pyspark.sql.functions import monotonically_increasing_id, unix_timestamp, coalesce
 from pyspark.sql.utils import AnalysisException
 import shutil
 
 from shared.objects.samples import SamplesManager
-from shared.settings import CF_TRUST_DELAY, START_DATE, cf_conn, cp_conn, TMP_DIR, BIN_DIR
+from shared.settings import CF_TRUST_DELAY, START_DATE, MODEL_TRAIN_DATE_START, cf_conn, cp_conn, TMP_DIR, BIN_DIR
 from ..base import SparkCrymeTask, NativeCrymeTask
 from ..constants import safety_rel_crimes
 from ..mappings import ts_conv, crime_group_assignment_udf, t_occ_conv, actb_lat, actb_lon
@@ -28,10 +28,10 @@ class CleanCrimeIncidents(SparkCrymeTask):
     def run(self):
         raw_crime_incidents = self.load_df_from_crymefeeder("incidents")
         crime_incidents = raw_crime_incidents.withColumn('date_occ', ts_conv(raw_crime_incidents.date_occ))
-        crime_incidents = crime_incidents.filter(crime_incidents.date_occ > datetime.now().date() - timedelta(days=365))
+        crime_incidents = crime_incidents.filter(crime_incidents.date_occ > MODEL_TRAIN_DATE_START)
         crime_incidents = crime_incidents.filter(crime_incidents.crm_cd.isin(list(safety_rel_crimes.keys())))
-        crime_incidents = crime_incidents.withColumn('lon', crime_incidents.location_1.coordinates[1])
-        crime_incidents = crime_incidents.withColumn('lat', crime_incidents.location_1.coordinates[0])
+        crime_incidents = crime_incidents.withColumn("lon", coalesce(crime_incidents.location_1.coordinates[1], crime_incidents.lon.cast("double")))
+        crime_incidents = crime_incidents.withColumn('lat', coalesce(crime_incidents.location_1.coordinates[0], crime_incidents.lat.cast("double")))
         crime_incidents = crime_incidents.select(
             ['_id', 'crm_cd', 'crm_cd_desc', 'date_occ', 'time_occ', 'premis_desc', 'lon', 'lat']
         )
@@ -51,8 +51,8 @@ class AddFeaturesToCrimeIncidents(SparkCrymeTask):
         crime_incidents = crime_incidents.withColumn('crm_grp', crime_group_assignment_udf(crime_incidents.crm_cd))
         crime_incidents = crime_incidents.withColumn('time_occ_seconds', t_occ_conv(crime_incidents.time_occ))
         crime_incidents = crime_incidents.withColumn('date_occ_unix', unix_timestamp(crime_incidents.date_occ))
-        crime_incidents = crime_incidents.withColumn('lat_bb_c', actb_lat(crime_incidents.lat))
-        crime_incidents = crime_incidents.withColumn('lon_bb_c', actb_lon(crime_incidents.lon))
+        crime_incidents = crime_incidents.withColumn('lat_bb_c', actb_lat(crime_incidents.lon))  # need to unrev columns in samples
+        crime_incidents = crime_incidents.withColumn('lon_bb_c', actb_lon(crime_incidents.lat))  # need to unrev columns in samples
         crime_incidents = crime_incidents.withColumn(
             'ts_occ_unix', crime_incidents.date_occ_unix + crime_incidents.time_occ_seconds
         )

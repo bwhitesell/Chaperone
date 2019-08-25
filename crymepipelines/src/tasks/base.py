@@ -43,9 +43,10 @@ class NativeCrymeTask(BaseCrymeTask):
         from lightgbm import LGBMClassifier
         from sklearn.calibration import CalibratedClassifierCV
         from sklearn.metrics import log_loss
+        import numpy as np
 
         self._local_mod_access = {}
-        for _module in [pandas, LGBMClassifier, log_loss, CalibratedClassifierCV]:
+        for _module in [pandas, LGBMClassifier, log_loss, CalibratedClassifierCV, np]:
             self._local_mod_access[_module.__name__] = _module
 
         super().__init__()

@@ -23,7 +23,7 @@ cli_args = {
 
 # PIPE RAW EVENTS DAG #
 pipe_events_dag = DAG('clean_agg_pipe', default_args=default_args,
-                      schedule_interval='0 12 * * *', catchup=False)
+                      schedule_interval='0 11 * * *', catchup=False)
 
 t0 = BashOperator(
     task_id='generate_location_time_samples',

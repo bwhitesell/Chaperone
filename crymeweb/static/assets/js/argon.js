@@ -1137,4 +1137,45 @@ var CrimeVolumeChart = (function() {
 })();
 
 
+var ctx = document.getElementById("model-health-chart");
+var myChart = new Chart(ctx, {
+type: 'line',
+data: {
+  labels: nt_labels,
+  datasets: [
+    {
+      pointRadius: 2,
+      pointHoverRadius: 0,
+      borderWidth: 2,
+      data: t_ce,
+      label: 'Model Health'
+    }
+  ]
+},
+  options: {
+    legend: {
+      display: false
+    },
+
+    tooltips: {
+      enabled: false
+    },
+
+    scales: {
+      yAxes: [{
+        gridLines: {
+          drawBorder: true,
+
+        },
+      }],
+      xAxes: [{
+        gridLines: {
+          drawBorder: true,
+        },
+      }]
+    },
+  }
+});
+
+
 

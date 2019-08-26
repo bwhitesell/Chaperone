@@ -13,6 +13,10 @@ class CrymeClassifierManager(models.Manager):
         active_models = self.filter(active=True)
         return {model: model.clf for model in active_models}
 
+    def load_model(self, id):
+        active_models = self.filter(active=True)
+        return active_models.get(id=id)
+
 
 class CrymeClassifier(models.Model):
     name = models.CharField(max_length=20, null=False, blank=False)

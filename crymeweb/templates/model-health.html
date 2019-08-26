@@ -12,45 +12,45 @@
 
             </div>
           <!-- Card stats -->
+
             <div class="row" style="padding: None;">
-        <div class="col-xl-8 mb-5 mb-xl-0">
-          {% include 'cards/daily-crime-risk-line-chart-card.html' %}
+        <div class="col-xl-12 mb-5 mb-xl-0">
+          {% include 'cards/model-error-line-chart.html' %}
         </div>
-        <div class="col-xl-4 mb-5 mb-xl-0">
-          {% include 'cards/proximity-map-card.html' %}
         </div>
-      </div>
         </div>
       </div>
     </div>
     <!-- Page content -->
     <div class="container-fluid mt--3">
-  <div class="row">
-            {% for risk_est in risk_ests_row_1 %}
-              <div class="col-xl-3 col-lg-6">
-                {% include 'cards/real-time-crime-risk-card.html' %}
-              </div>
-            {% endfor %}
-          <div class="row">
-            {% for risk_est in risk_ests_row_2 %}
-             <div class="col-xl-3 col-lg-6">
-               {% include 'cards/real-time-crime-risk-card.html' %}
-             </div>
-            {% endfor %}
-          </div>
-  </div>
-      <div class="row mt-5">
-        <div class="col-xl-8 mb-5 mb-xl-0">
+
+      <div class="row">
+        <div class="col-md-12">
           <div class="card shadow">
             <div class="card-header border-0">
               <div class="row align-items-center">
                 <div class="col">
-                  <h3 class="mb-0">Recent Crimes (Nearby)</h3>
+                  <h3 class="mb-0">Model Telemetry</h3>
                 </div>
               </div>
             </div>
-            {% include 'tables/recent-crimes-table.html' %}
+            {% include 'cards/model-telemetry-card.html' %}
           </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <br>
+          <a href="/model-health/1"> Theft Classifier |</a>
+          <a href="/model-health/2"> Burglary Classifier |</a>
+          <a href="/model-health/3"> Assault/Battery Classifier |</a>
+          <a href="/model-health/4"> Shoplifting/Pickpocketing Classifier |</a>
+          <a href="/model-health/5"> Property Damage/Threats Classifier |</a>
+          <a href="/model-health/6"> Burglary/Theft From Vehicle Classifier |</a>
+          <a href="/model-health/7"> Life-threatening Violent Crime Classifier |</a>
+          <a href="/model-health/8"> VBBS Classifier |</a>
+          <a href="/model-health/9"> Misc Infrequent Offenses Classifier |</a>
+          <a href="/model-health/10"> Robbery Classifier |</a>
         </div>
       </div>
       <!-- Footer -->
@@ -66,6 +66,7 @@
               <li class="nav-item">
                 <a href="https://www.crymeclarity.com" class="nav-link" target="_blank">Chaperone</a>
               </li>
+
             </ul>
           </div>
         </div>

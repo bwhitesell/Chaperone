@@ -5,7 +5,7 @@ from django.http import HttpResponseBadRequest, Http404
 
 from crime.models import CrimeIncident
 from regions.models import GeometricRegion
-from .models import CrymeClassifier
+from .models import CrymeClassifier, ModelPerformance
 from .utils import build_view_box, lat_delta, lon_delta
 
 
@@ -70,4 +70,22 @@ def dashboard_view(request):
         'y_axis_max': y_axis_max,
     }
     return render(request, 'dashboard.html', context)
+
+
+def health_view(request, pk):
+    model = CrymeClassifier.objects.load_model(pk)
+    mp = ModelPerformance.objects.all()
+
+    ctx = {
+        'days': [str(p.day) for p in mp],
+        't_ce': [p.__dict__['log_loss_' + model.target] for p in mp],
+        'n_estimators': model.clf.base_estimator.n_estimators,
+        'num_leaves': model.clf.base_estimator.num_leaves,
+        'max_depth': model.clf.base_estimator.max_depth,
+        'learning_rate': model.clf.base_estimator.learning_rate,
+        'reg_lambda': model.clf.base_estimator.reg_lambda,
+        'model_name': model.name,
+    }
+
+    return render(request, 'model-health.html', ctx)
 

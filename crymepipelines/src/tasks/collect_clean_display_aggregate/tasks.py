@@ -30,8 +30,8 @@ class CleanCrimeIncidents(SparkCrymeTask):
         crime_incidents = raw_crime_incidents.withColumn('date_occ', ts_conv(raw_crime_incidents.date_occ))
         crime_incidents = crime_incidents.filter(crime_incidents.date_occ > MODEL_TRAIN_DATE_START)
         crime_incidents = crime_incidents.filter(crime_incidents.crm_cd.isin(list(safety_rel_crimes.keys())))
-        crime_incidents = crime_incidents.withColumn("lon", coalesce(crime_incidents.location_1.coordinates[1], crime_incidents.lon.cast("double")))
-        crime_incidents = crime_incidents.withColumn('lat', coalesce(crime_incidents.location_1.coordinates[0], crime_incidents.lat.cast("double")))
+        crime_incidents = crime_incidents.withColumn("lon", crime_incidents.lon.cast("double"))
+        crime_incidents = crime_incidents.withColumn('lat', crime_incidents.lat.cast("double"))
         crime_incidents = crime_incidents.select(
             ['_id', 'crm_cd', 'crm_cd_desc', 'date_occ', 'time_occ', 'premis_desc', 'lon', 'lat']
         )

@@ -74,7 +74,7 @@ def dashboard_view(request):
 
 def health_view(request, pk):
     model = CrymeClassifier.objects.load_model(pk)
-    mp = ModelPerformance.objects.all().order_by('days')
+    mp = ModelPerformance.objects.all().order_by('day')
 
     ctx = {
         'days': [str(p.day) for p in mp],

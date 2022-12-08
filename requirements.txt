@@ -2,7 +2,7 @@ apache-airflow==1.10.3
 attrs==19.1.0
 backcall==0.1.0
 bleach==3.1.0
-certifi==2019.3.9
+certifi==2022.12.7
 chardet==3.0.4
 cycler==0.10.0
 decorator==4.4.0
@@ -69,7 +69,7 @@ widgetsnbextension==3.4.2
 attrs==19.1.0
 backcall==0.1.0
 bleach==3.1.0
-certifi==2019.3.9
+certifi==2022.12.7
 chardet==3.0.4
 cycler==0.10.0
 decorator==4.4.0
